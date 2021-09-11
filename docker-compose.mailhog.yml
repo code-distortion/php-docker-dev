@@ -1,0 +1,11 @@
+version: '3.7'
+services:
+
+  mailhog:
+    image: '${MAILHOG_IMAGE:-mailhog/mailhog:latest}'
+    ports:
+      - "127.0.0.1:${MAILHOG_FORWARD_EXPOSE_PORT:-}:1025"
+      - "127.0.0.1:${MAILHOG_DASHBOARD_EXPOSE_PORT:-8025}:8025"
+    volumes:
+      - ./volumes/mailhog:/maildir:delegated
+    command: ["-storage=maildir", "-maildir-path=/maildir"]

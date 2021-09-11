@@ -1,0 +1,7 @@
+version: '3.7'
+services:
+
+  selenium:
+    image: '${SELENIUM_IMAGE:-selenium/standalone-chrome:latest}'
+    volumes:
+      - '/dev/shm:/dev/shm'

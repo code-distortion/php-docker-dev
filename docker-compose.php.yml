@@ -1,0 +1,38 @@
+version: '3.7'
+services:
+
+  php:
+    build:
+      context: './build/php'
+      args:
+        - SET_WWW_DATA_USER=${SET_WWW_DATA_USER:-true}
+        - WWW_DATA_UID=${WWW_DATA_UID:-1000}
+        - WWW_DATA_GID=${WWW_DATA_GID:-1000}
+        - GIT_USER=${GIT_USER:-Your Name}
+        - GIT_EMAIL=${GIT_EMAIL:-your@email.com}
+        - PHP_VERSION=${PHP_VERSION:-8.0}
+        - PHP_INSTALL_XDEBUG=${PHP_INSTALL_XDEBUG:-false}
+        - PHP_INSTALL_PCOV=${PHP_INSTALL_PCOV:-true}
+        - PHP_INSTALL_COMPOSER=${PHP_INSTALL_COMPOSER:-true}
+        - PHP_INSTALL_NPM=${PHP_INSTALL_NPM:-false}
+        - PHP_INSTALL_MYSQL_CLIENT=${PHP_INSTALL_MYSQL_CLIENT:-true}
+        - PHP_INSTALL_REDIS=${PHP_INSTALL_REDIS:-true}
+        - PHP_INSTALL_APACHE2_UTILS=${PHP_INSTALL_APACHE2_UTILS:-true}
+        - PHP_INSTALL_GIT=${PHP_INSTALL_GIT:-true}
+        - PHP_INSTALL_VIM=${PHP_INSTALL_VIM:-true}
+        - PHP_INSTALL_WGET=${PHP_INSTALL_WGET:-true}
+    environment:
+      - PHP_SERVE_WEB_ROOT=${PHP_SERVE_WEB_ROOT:-/var/www/html}
+      - PHP_SERVE_USING_PHP=${PHP_SERVE_USING_PHP:-false}
+      - PHP_SERVE_USING_LARAVEL=${PHP_SERVE_USING_LARAVEL:-false}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-}
+      - SSH_AUTH_SOCK=/ssh_agent
+      - XDEBUG_CONFIG=${PHP_XDEBUG_CONFIG:-client_host=host.docker.internal xdebug.mode=develop,coverage,debug}
+    ports:
+      - "127.0.0.1:${PHP_SERVE_PORT:-}:80"
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    volumes:
+      - ${PHP_VOLUME_SOURCE:-../}:/var/www/html:delegated
+      - ./build/php/profile.d:/etc/profile.d
+      - ${SSH_AGENT_PATH}:/ssh_agent

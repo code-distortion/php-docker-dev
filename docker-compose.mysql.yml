@@ -1,0 +1,21 @@
+version: '3.7'
+services:
+
+  mysql:
+    image: '${MYSQL_IMAGE:-mysql:latest}'
+    environment:
+      MYSQL_ROOT_PASSWORD: '${MYSQL_ROOT_PASSWORD:-}'
+      MYSQL_DATABASE: '${MYSQL_DATABASE:-db}'
+      MYSQL_USER: '${MYSQL_USER:-db}'
+      MYSQL_PASSWORD: '${MYSQL_PASSWORD:-}'
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+    ports:
+        - '127.0.0.1:${MYSQL_EXPOSE_PORT:-}:3306'
+    expose:
+        - 3306
+    volumes:
+      - ./volumes/mysql:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-p${MYSQL_PASSWORD:-}"]
+      retries: 3
+      timeout: 5s

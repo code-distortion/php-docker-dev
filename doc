@@ -1,0 +1,214 @@
+#!/bin/bash
+
+# grab the current host user's uid and gid
+# pass them as environment variables to docker-compose
+export WWW_DATA_UID=${WWW_DATA_UID:-$UID}
+export WWW_DATA_GID=${WWW_DATA_GID:-$(id -g)}
+
+WWW_DATA_CONTAINERS=("php")
+declare -A POSSIBLE_CONTAINERS
+declare -A ENABLED_CONTAINERS
+
+DEFAULT_DATABASE=db
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+#BLUE='\033[0;34m'
+NC='\033[0m'
+
+
+
+# end the script with an error message
+die () {
+    echo -e "\n${RED}ERROR${NC}: $*\n"
+    exit 1;
+}
+
+# check things needed for this script to run
+init_check () {
+
+    # ensure that Docker is running
+    if ! docker info > /dev/null 2>&1; then
+        die "Docker is not running"
+        exit 1
+    fi
+
+    # check to make sure the .env file exists
+    if [[ ! -f .env ]]; then
+        die "The \".env\" file does not exist - make a copy of \".env.example\""
+    fi
+}
+
+# build the list of enabled containers
+find_containers () {
+
+    local CONTAINER
+    local ENV_VALUE
+
+    for FILE in docker-compose.*.yml
+    do
+        CONTAINER=$FILE; CONTAINER="${CONTAINER#docker-compose.}"; CONTAINER="${CONTAINER%.yml}" # remove "docker-compose." and ".yml"
+
+        # track all of the POSSIBLE containers
+        POSSIBLE_CONTAINERS[$CONTAINER]=$CONTAINER
+
+        # check if XYZ_CONTAINER is enabled via the .env file
+        ENV_VALUE=$(read_dot_env .env "${CONTAINER^^}_CONTAINER")
+        if [[ ${ENV_VALUE,,} = true ]]; then
+            # track all of the ENABLED containers
+            ENABLED_CONTAINERS[$CONTAINER]=$CONTAINER
+        fi
+    done
+}
+
+# build the list of config files to include
+build_config_file_list () {
+
+    if [ -f "docker-compose.yml" ]; then
+        echo "-f docker-compose.yml "
+    fi
+
+    local CONTAINER
+    for CONTAINER in "${ENABLED_CONTAINERS[@]}"
+    do
+        echo "-f docker-compose.${CONTAINER}.yml "
+    done
+}
+
+# run a command and exit
+run_command () {
+    echo -e "\n${GREEN}COMMAND${NC}: $*\n"
+    "$@"
+    echo
+    exit $?
+}
+
+# run a docker-compose command
+run_docker_compose_command () {
+    CONFIG_FILES=$(build_config_file_list)
+    run_command docker-compose $CONFIG_FILES "$@"
+}
+
+# read a value from a .env file
+read_dot_env () {
+    local LINES
+    LINES=$(grep -E '^[ ]*[^#]' $1)
+    local VAR
+    VAR=$(echo "$LINES" | grep "$2" | xargs)
+    IFS="=" read -ra VAR <<< "$VAR"
+    echo "${VAR[1]}"
+}
+
+# check if a value appears in an array
+array_contains () {
+    local array="$2[@]"
+    local seeking=$1
+    local in=1
+    for element in "${!array}"; do
+        if [[ $element == "$seeking" ]]; then
+            in=0
+            break
+        fi
+    done
+    return $in
+}
+
+# resolve a container name
+resolve_container_name () {
+    if array_contains "$1" POSSIBLE_CONTAINERS; then
+        echo "$1"
+        return
+    fi
+}
+
+# check if a container is enabled
+is_container_enabled () {
+    if array_contains "$1" ENABLED_CONTAINERS; then
+        echo true
+    fi
+}
+
+# determine which user to bash in with
+pick_user () {
+    local CONTAINER=$1
+    local SUDO_REQUESTED=$2
+
+    if [ "$SUDO_REQUESTED" ] || ! array_contains "$1" WWW_DATA_CONTAINERS; then
+        echo "root"
+    else
+        echo "www-data"
+    fi
+}
+
+# jump into the database
+enter_database () {
+    if [ $# -eq 1 ] && [ "$1" = 'db' ]; then
+
+        if [[ -z "${ENABLED_CONTAINERS['mysql']+unset}" ]]; then
+            die "The \"mysql\" container has not been enabled - enable via the .env file"
+        fi
+
+        DATABASE=$(read_dot_env .env MYSQL_DATABASE)
+        if [ -z "$DATABASE" ]; then
+            DATABASE=$DEFAULT_DATABASE
+        fi
+
+        PASSWORD=$(read_dot_env .env MYSQL_ROOT_PASSWORD)
+        if [ -z "$PASSWORD" ]; then
+            run_docker_compose_command exec mysql mysql --user=root "$DATABASE" -A
+        else
+            run_docker_compose_command exec mysql mysql --user=root --password="$PASSWORD" "$DATABASE" -A
+        fi
+    fi
+}
+
+# either enter into a particular container, or execute something in it
+enter_container_or_run_command () {
+    CONTAINER=$(resolve_container_name "$1")
+    if [[ -n "$CONTAINER" ]]; then
+
+        if [[ -z $(is_container_enabled "$CONTAINER") ]]; then
+            die "The \"$CONTAINER\" container has not been enabled - enable via the .env file"
+        fi
+
+        USER=$(pick_user "$CONTAINER" "$SUDO_REQUESTED")
+
+        # bash into the container
+        if [ $# -eq 1 ]; then
+            run_docker_compose_command exec --user="$USER" "$CONTAINER" bash --login
+        # or run a command in the container
+        else
+            shift 1
+            run_docker_compose_command exec --user="$USER" "$CONTAINER" "$@"
+        fi
+    fi
+}
+
+
+
+
+
+### script start
+
+# change directory so the docker-compose.xxx.yml files can be found
+CURRENT_SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+cd "$CURRENT_SCRIPT_DIR" || exit
+
+init_check
+find_containers
+
+# 1. jump into the database - if requested
+enter_database "$@"
+
+# check if sudo is desired
+ORIG_ARGS=$* # record the original arguments
+if [[ $1 == "sudo" ]]; then
+    SUDO_REQUESTED=true
+    shift 1 # remove "sudo" from the arguments
+fi
+
+# 2. either enter into a particular container, or execute something in it - if requested
+enter_container_or_run_command "$@"
+
+# 3. or just pass the command through to docker-compose
+run_docker_compose_command $ORIG_ARGS

@@ -1,0 +1,160 @@
+ARG PHP_VERSION
+FROM php:$PHP_VERSION-fpm
+
+SHELL ["/bin/bash", "--login", "-c"]
+RUN apt-get update
+
+
+
+# ====== some general programs ======
+RUN apt-get install -y \
+    procps \
+    supervisor \
+    gettext \
+    ;
+
+
+# ====== PHP extensions ======
+RUN apt-get install -y \
+        libfreetype6-dev \
+        libicu-dev \
+        libjpeg62-turbo-dev \
+        libmcrypt-dev \
+        libpng-dev \
+        libzip-dev \
+        zlib1g-dev \
+    && docker-php-ext-configure gd --with-jpeg \
+    && docker-php-ext-install -j$(nproc) gd \
+    && docker-php-ext-install bcmath \
+#    && docker-php-ext-install calendar \
+    && docker-php-ext-install intl \
+#    && docker-php-ext-install mysqli \
+    && docker-php-ext-install pdo_mysql \
+    && docker-php-ext-install zip \
+    ;
+
+
+
+# ====== Xdebug ======
+ARG PHP_INSTALL_XDEBUG
+RUN if [ "$PHP_INSTALL_XDEBUG" = true ]; then \
+    pecl install xdebug \
+    && docker-php-ext-enable xdebug \
+;fi
+
+
+
+# ====== PCOV ======
+ARG PHP_INSTALL_PCOV
+RUN if [ ${PHP_INSTALL_PCOV} = true ]; then \
+    pecl install pcov \
+    && docker-php-ext-enable pcov \
+;fi
+
+
+
+# ====== install redis ======
+ARG PHP_INSTALL_REDIS
+RUN if [ "$PHP_INSTALL_REDIS" = true ]; then \
+    pecl install redis \
+    && docker-php-ext-enable redis \
+;fi
+
+
+
+# ====== npm and node ======
+ARG PHP_INSTALL_NPM
+RUN if [ "$PHP_INSTALL_NPM" = true ]; then \
+    set -o pipefail \
+    && curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash \
+;fi
+RUN if [ "$PHP_INSTALL_NPM" = true ]; then nvm install lts/fermium ;fi
+
+
+
+# ====== mysql-client ======
+ARG PHP_INSTALL_MYSQL_CLIENT
+RUN if [ "$PHP_INSTALL_MYSQL_CLIENT" = true ]; then \
+    apt-get install -y default-mysql-client \
+;fi
+
+
+
+# ====== Composer ======
+ARG PHP_INSTALL_COMPOSER
+RUN if [ "$PHP_INSTALL_COMPOSER" = true ]; then \
+    set -o pipefail \
+    && curl https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
+    && mkdir /var/www/.composer && chown www-data: /var/www/.composer \
+;fi
+
+
+
+# ====== apache2-utils ======
+ARG PHP_INSTALL_APACHE2_UTILS
+RUN if [ "$PHP_INSTALL_APACHE2_UTILS" = true ]; then apt-get install -y apache2-utils ;fi
+
+
+
+# ====== Git ======
+ARG PHP_INSTALL_GIT
+ARG GIT_USER
+ARG GIT_EMAIL
+RUN if [ "$PHP_INSTALL_GIT" = true ]; then \
+    apt-get install -y git \
+    && git config --global user.email "$GIT_EMAIL" \
+    && git config --global user.name "$GIT_USER" \
+;fi
+
+
+
+# ====== Vim ======
+ARG PHP_INSTALL_VIM
+RUN if [ "$PHP_INSTALL_VIM" = true ]; then apt-get install -y vim ;fi
+
+
+
+# ====== wget ======
+ARG PHP_INSTALL_WGET
+RUN if [ "$PHP_INSTALL_WGET" = true ]; then apt-get install -y wget ;fi
+
+
+
+# ====== remove things that aren't needed anymore ======
+RUN apt-get remove -y --purge \
+    g++ \
+    ;
+
+
+
+# ====== set the www-data user to match the current user's uid and gid ======
+ARG SET_WWW_DATA_USER
+ARG WWW_DATA_UID
+ARG WWW_DATA_GID
+RUN if [ ${SET_WWW_DATA_USER} = true ]; then \
+    groupmod -g $WWW_DATA_GID www-data \
+    && usermod -u $WWW_DATA_UID -g $WWW_DATA_GID www-data \
+;fi
+
+
+
+# ====== (.config dir for php artisan tinker) ======
+RUN mkdir /var/www/.config && chown www-data: /var/www/.config
+
+
+
+# ====== copy configs and settings last ======
+COPY configs/ssh_config /etc/ssh/ssh_config
+
+COPY configs/supervisord.laravel-serve.conf /etc/supervisor/conf.d/supervisord.laravel-serve.template.conf
+COPY configs/supervisord.php-serve.conf /etc/supervisor/conf.d/supervisord.php-serve.template.conf
+COPY configs/supervisord.noop.conf /etc/supervisor/conf.d/supervisord.noop.conf
+
+COPY configs/php.ini /usr/local/etc/php/conf.d/php.ini
+
+COPY configs/www.conf /usr/local/etc/php-fpm.d/www.conf
+
+COPY scripts/start-container /usr/local/bin/start-container
+RUN chmod +x /usr/local/bin/start-container
+
+ENTRYPOINT ["start-container"]

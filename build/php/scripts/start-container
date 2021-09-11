@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -e
+
+if [ "$PHP_SERVE_USING_PHP" = true ]; then
+    envsubst < /etc/supervisor/conf.d/supervisord.php-serve.template.conf > /etc/supervisor/conf.d/supervisord.php-serve.conf
+    /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.php-serve.conf
+elif [ "$PHP_SERVE_USING_LARAVEL" = true ]; then
+    envsubst < /etc/supervisor/conf.d/supervisord.laravel-serve.template.conf > /etc/supervisor/conf.d/supervisord.laravel-serve.conf
+    /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.laravel-serve.conf
+else
+    /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.noop.conf
+fi
