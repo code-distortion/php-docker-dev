@@ -120,6 +120,18 @@ RUN if [ "$PHP_INSTALL_WGET" = true ]; then apt-get install -y wget ;fi
 
 
 
+# ====== chromium ======
+ARG PHP_INSTALL_CHROMIUM
+RUN if [ "$PHP_INSTALL_CHROMIUM" = true ]; then \
+    apt-get install -y \
+    chromium \
+    # for chromedriver...
+    libnss3 \
+    libdbus-1-3 \
+;fi
+
+
+
 # ====== remove things that aren't needed anymore ======
 RUN apt-get remove -y --purge \
     g++ \
