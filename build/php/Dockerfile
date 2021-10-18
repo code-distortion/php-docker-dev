@@ -4,6 +4,9 @@ FROM php:$PHP_VERSION-fpm
 SHELL ["/bin/bash", "--login", "-c"]
 RUN apt-get update
 
+ENV TZ=UTC
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
 
 
 # ====== some general programs ======
@@ -30,6 +33,7 @@ RUN apt-get install -y \
     && docker-php-ext-install intl \
 #    && docker-php-ext-install mysqli \
     && docker-php-ext-install pdo_mysql \
+    && docker-php-ext-install pcntl \
     && docker-php-ext-install zip \
     ;
 
@@ -96,6 +100,12 @@ RUN if [ "$PHP_INSTALL_APACHE2_UTILS" = true ]; then apt-get install -y apache2-
 
 
 
+# ====== gzip ======
+ARG PHP_INSTALL_GZIP
+RUN if [ "$PHP_INSTALL_GZIP" = true ]; then apt-get install -y gzip ;fi
+
+
+
 # ====== Git ======
 ARG PHP_INSTALL_GIT
 ARG GIT_USER
@@ -133,8 +143,9 @@ RUN if [ "$PHP_INSTALL_CHROMIUM" = true ]; then \
 
 
 # ====== remove things that aren't needed anymore ======
-RUN apt-get remove -y --purge \
-    g++ \
+RUN apt-get -y autoremove \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
     ;
 
 
@@ -160,13 +171,13 @@ COPY configs/ssh_config /etc/ssh/ssh_config
 
 COPY configs/supervisord.laravel-serve.conf /etc/supervisor/conf.d/supervisord.laravel-serve.template.conf
 COPY configs/supervisord.php-serve.conf /etc/supervisor/conf.d/supervisord.php-serve.template.conf
-COPY configs/supervisord.noop.conf /etc/supervisor/conf.d/supervisord.noop.conf
 
 COPY configs/php.ini /usr/local/etc/php/conf.d/php.ini
 
 COPY configs/www.conf /usr/local/etc/php-fpm.d/www.conf
 
-COPY scripts/start-container /usr/local/bin/start-container
-RUN chmod +x /usr/local/bin/start-container
+COPY scripts/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
-ENTRYPOINT ["start-container"]
+ENTRYPOINT ["docker-entrypoint.sh"]
+CMD ["php-fpm"]

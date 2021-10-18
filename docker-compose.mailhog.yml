@@ -7,5 +7,5 @@ services:
       - "127.0.0.1:${MAILHOG_FORWARD_EXPOSE_PORT:-}:1025"
       - "127.0.0.1:${MAILHOG_DASHBOARD_EXPOSE_PORT:-8025}:8025"
     volumes:
-      - ./volumes/mailhog:/maildir:delegated
+      - ./volumes/mailhog:/maildir
     command: ["-storage=maildir", "-maildir-path=/maildir"]

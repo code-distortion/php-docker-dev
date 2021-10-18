@@ -18,6 +18,7 @@ services:
         - PHP_INSTALL_MYSQL_CLIENT=${PHP_INSTALL_MYSQL_CLIENT:-true}
         - PHP_INSTALL_REDIS=${PHP_INSTALL_REDIS:-true}
         - PHP_INSTALL_APACHE2_UTILS=${PHP_INSTALL_APACHE2_UTILS:-true}
+        - PHP_INSTALL_GZIP=${PHP_INSTALL_GZIP:-true}
         - PHP_INSTALL_GIT=${PHP_INSTALL_GIT:-true}
         - PHP_INSTALL_VIM=${PHP_INSTALL_VIM:-true}
         - PHP_INSTALL_WGET=${PHP_INSTALL_WGET:-true}
@@ -30,10 +31,11 @@ services:
       - SSH_AUTH_SOCK=/ssh_agent
       - XDEBUG_CONFIG=${PHP_XDEBUG_CONFIG:-client_host=host.docker.internal xdebug.mode=develop,coverage,debug}
     ports:
-      - "127.0.0.1:${PHP_SERVE_PORT:-}:80"
+      - "${NGINX_EXPOSE_TO_IP:-127.0.0.1}:${PHP_SERVE_HTTP_PORT:-}:80"
     extra_hosts:
       - 'host.docker.internal:host-gateway'
     volumes:
-      - ${PHP_VOLUME_SOURCE:-../}:/var/www/html:delegated
+      - ${PHP_VOLUME_SOURCE:-../}:/var/www/html
       - ./build/php/profile.d:/etc/profile.d
       - ${SSH_AGENT_PATH}:/ssh_agent
+      - ./logs/php:/var/www/html/storage/logs
