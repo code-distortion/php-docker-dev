@@ -10,7 +10,7 @@ services:
         - WWW_DATA_GID=${WWW_DATA_GID:-1000}
         - GIT_USER=${GIT_USER:-Your Name}
         - GIT_EMAIL=${GIT_EMAIL:-your@email.com}
-        - PHP_VERSION=${PHP_VERSION:-8.0}
+        - PHP_VERSION=${PHP_VERSION:-8.1}
         - PHP_INSTALL_XDEBUG=${PHP_INSTALL_XDEBUG:-false}
         - PHP_INSTALL_PCOV=${PHP_INSTALL_PCOV:-true}
         - PHP_INSTALL_COMPOSER=${PHP_INSTALL_COMPOSER:-true}
