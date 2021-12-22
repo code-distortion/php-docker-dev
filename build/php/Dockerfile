@@ -101,6 +101,7 @@ RUN if [ "$PHP_INSTALL_COMPOSER" = true ]; then \
     set -o pipefail \
     && curl https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
     && mkdir /var/www/.composer && chown www-data: /var/www/.composer \
+    && mkdir /var/www/.ssh && chown www-data: /var/www/.ssh \
 ;fi
 
 
