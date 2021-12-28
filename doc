@@ -179,6 +179,13 @@ enter_container_or_run_command () {
         # or run a command in the container
         else
             shift 1
+
+            # execute a "php artisan" command
+            if [[ $1 == "pa" ]]; then
+                shift 1
+                run_docker_compose_command exec --user="$USER" "$CONTAINER" php artisan "$@"
+            fi
+
             run_docker_compose_command exec --user="$USER" "$CONTAINER" "$@"
         fi
     fi
