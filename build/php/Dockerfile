@@ -118,6 +118,12 @@ RUN if [ "$PHP_INSTALL_GZIP" = true ]; then apt-get install -y gzip ;fi
 
 
 
+# ====== zip ======
+ARG PHP_INSTALL_ZIP
+RUN if [ "$PHP_INSTALL_ZIP" = true ]; then apt-get install -y zip ;fi
+
+
+
 # ====== Git ======
 ARG PHP_INSTALL_GIT
 ARG GIT_USER
