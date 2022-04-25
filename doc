@@ -91,26 +91,32 @@ run_docker_compose_command () {
 
 # read a value from a .env file
 read_dot_env () {
+
     local LINES
-    LINES=$(grep -E '^[ ]*[^#]' $1)
+    local FILE=$1
+    local SEARCH=$2
     local VAR
-    VAR=$(echo "$LINES" | grep "$2" | xargs)
+
+    LINES=$(grep -E '^[ ]*[^#]' $FILE)
+    VAR=$(echo "$LINES" | grep "${SEARCH}=" | xargs)
     IFS="=" read -ra VAR <<< "$VAR"
     echo "${VAR[1]}"
 }
 
 # check if a value appears in an array
 array_contains () {
-    local array="$2[@]"
-    local seeking=$1
-    local in=1
-    for element in "${!array}"; do
-        if [[ $element == "$seeking" ]]; then
-            in=0
+    local ARRAY="$2[@]"
+    local SEEKING=$1
+    local ELEMENT
+    local IN=1
+
+    for ELEMENT in "${!ARRAY}"; do
+        if [[ $ELEMENT == "$SEEKING" ]]; then
+            IN=0
             break
         fi
     done
-    return $in
+    return $IN
 }
 
 # resolve a container name
