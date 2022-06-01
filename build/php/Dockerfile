@@ -90,6 +90,7 @@ RUN if [ "$PHP_INSTALL_NPM" = true ]; then nvm install lts/fermium ;fi
 # ====== mysql-client ======
 ARG PHP_INSTALL_MYSQL_CLIENT
 RUN if [ "$PHP_INSTALL_MYSQL_CLIENT" = true ]; then \
+    apt-get update --allow-releaseinfo-change-suite && \
     apt-get install -y default-mysql-client \
 ;fi
 
