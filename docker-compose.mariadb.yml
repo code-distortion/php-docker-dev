@@ -1,0 +1,23 @@
+version: '3.7'
+services:
+
+  mariadb:
+    image: '${MARIADB_IMAGE:-mariadb:10}'
+    environment:
+      MYSQL_ROOT_PASSWORD: '${MARIADB_ROOT_PASSWORD:-}'
+      MYSQL_DATABASE: '${MARIADB_DATABASE:-db}'
+      MYSQL_USER: '${MARIADB_USER:-db}'
+      MYSQL_PASSWORD: '${MARIADB_PASSWORD:-}'
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+    ports:
+      - '127.0.0.1:${MARIADB_EXPOSE_PORT:-}:3306'
+    expose:
+      - 3306
+#    tmpfs:
+#      - /var/lib/mysql
+    volumes:
+      - ./volumes/mariadb:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-p${MARIADB_PASSWORD:-}"]
+      retries: 3
+      timeout: 5s

@@ -13,6 +13,8 @@ services:
       - '127.0.0.1:${MYSQL_EXPOSE_PORT:-}:3306'
     expose:
       - 3306
+#    tmpfs:
+#      - /var/lib/mysql
     volumes:
       - ./volumes/mysql:/var/lib/mysql
     healthcheck:

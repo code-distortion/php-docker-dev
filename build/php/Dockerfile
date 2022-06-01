@@ -50,6 +50,12 @@ RUN apt-get install -y \
 
 
 
+# ====== wget ======
+ARG PHP_INSTALL_WGET
+RUN if [ "$PHP_INSTALL_WGET" = true ]; then apt-get install -y wget ;fi
+
+
+
 # ====== Xdebug ======
 ARG PHP_INSTALL_XDEBUG
 RUN if [ "$PHP_INSTALL_XDEBUG" = true ]; then \
@@ -92,6 +98,25 @@ ARG PHP_INSTALL_MYSQL_CLIENT
 RUN if [ "$PHP_INSTALL_MYSQL_CLIENT" = true ]; then \
     apt-get update --allow-releaseinfo-change-suite && \
     apt-get install -y default-mysql-client \
+;fi
+
+
+
+# ====== postgres-client ======
+ARG PHP_INSTALL_POSTGRES_CLIENT
+ARG PHP_POSTGRES_CLIENT_VERSION
+RUN if [ "$PHP_INSTALL_POSTGRES_CLIENT" = true ]; then \
+    apt-get update \
+    && apt-get install -y gnupg2 lsb-release \
+    && wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
+    && RELEASE=$(lsb_release -cs) \
+    && echo "deb http://apt.postgresql.org/pub/repos/apt/ ${RELEASE}"-pgdg main | tee /etc/apt/sources.list.d/pgdg.list \
+    && apt-get update \
+    && apt-get install -y ${PHP_POSTGRES_CLIENT_VERSION} \
+    && apt-get install -y libpq-dev \
+    && docker-php-ext-install pgsql \
+    && docker-php-ext-install pdo_pgsql \
+    && docker-php-ext-enable pdo_pgsql \
 ;fi
 
 
@@ -140,12 +165,6 @@ RUN if [ "$PHP_INSTALL_GIT" = true ]; then \
 # ====== Vim ======
 ARG PHP_INSTALL_VIM
 RUN if [ "$PHP_INSTALL_VIM" = true ]; then apt-get install -y vim ;fi
-
-
-
-# ====== wget ======
-ARG PHP_INSTALL_WGET
-RUN if [ "$PHP_INSTALL_WGET" = true ]; then apt-get install -y wget ;fi
 
 
 
