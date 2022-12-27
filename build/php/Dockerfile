@@ -188,6 +188,12 @@ RUN apt-get -y autoremove \
 
 
 
+# ====== add the php.log file for php to write to ======
+RUN touch /var/log/php.log
+RUN chown www-data: /var/log/php.log
+
+
+
 # ====== (.config dir for php artisan tinker) ======
 RUN mkdir /var/www/.config && chown www-data: /var/www/.config
 
