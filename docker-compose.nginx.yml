@@ -4,6 +4,8 @@ services:
   nginx:
     build:
       context: './build/nginx'
+      args:
+        - NGINX_IMAGE=${NGINX_IMAGE:-nginx}
     environment:
       - NGINX_WEB_ROOT=${NGINX_WEB_ROOT:-/var/www/html}
       - NGINX_HTTP_PORT=${NGINX_HTTP_PORT:-80}
@@ -24,7 +26,3 @@ services:
       - ${NGINX_VOLUME_SOURCE:-../}:/var/www/html
       - ./build/nginx/certs:/etc/ssl/certs
       - ./logs/nginx:/var/log/nginx
-    links:
-        - php
-    depends_on:
-        - php

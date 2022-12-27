@@ -1,4 +1,6 @@
-FROM nginx
+ARG NGINX_IMAGE
+FROM ${NGINX_IMAGE}
+
 RUN apt-get update && apt-get install -y vim
 
 COPY conf/nginx.conf /etc/nginx/nginx.conf

@@ -1,5 +1,5 @@
-ARG PHP_VERSION
-FROM php:$PHP_VERSION-fpm
+ARG PHP_IMAGE
+FROM ${PHP_IMAGE}
 
 SHELL ["/bin/bash", "--login", "-c"]
 RUN apt-get update
