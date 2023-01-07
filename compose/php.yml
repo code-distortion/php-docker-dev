@@ -5,7 +5,7 @@ services:
     build:
       context: './build/php'
       args:
-        - PHP_IMAGE=${PHP_IMAGE:-php:8.2.0-fpm}
+        - PHP_IMAGE=${PHP_IMAGE:-php:8.2.1-fpm}
         - SET_WWW_DATA_USER=${SET_WWW_DATA_USER:-true}
         - WWW_DATA_UID=${WWW_DATA_UID:-1000}
         - WWW_DATA_GID=${WWW_DATA_GID:-1000}
