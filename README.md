@@ -1,12 +1,14 @@
 # PHP Docker Dev
 
-This repo contains the *docker-compose* configuration to set up various Docker containers for PHP development. 
+This repo contains the *docker compose* configuration to set up various Docker containers for PHP development. 
 
 
 
 ## Warning
 
 This package was developed for my own **personal use**. It might not suit your needs or be documented properly, and may change at any time.
+
+
 
 ### Mac Users - Warning
 
@@ -22,59 +24,65 @@ Mac users may need to turn the `.env` `SET_WWW_DATA_USER` option off.
 
 1. Clone the repository: `git clone https://github.com/code-distortion/php-docker-dev.git .`
 2. Create a `.env` file by making a copy of `.env.example`, and update it with the settings you need.
-3. Build the containers using the `./doc` *docker-compose* wrapper: `./doc up -d --build`
+3. Build the containers using the `./doc` *docker compose* wrapper: `./doc up -d --build`
 
 
 
-## Usage - The *docker-compose* Wrapper: `./doc`
+## Usage - The *docker compose* Wrapper: `./doc`
 
-The `./doc` bash script is a ***docker-compose*** wrapper.
+The `./doc` bash script is a ***docker compose*** wrapper.
 
-It chooses which *docker-compose.xxx.yml* files to use, as well as provide shortcuts for common *docker-compose* commands.
+It chooses which *compose/xxx.yml* files to use, as well as provide shortcuts for common *docker compose* commands.
 
-Use this to interact with the containers instead of using *docker-compose* directly.
+Use this to interact with the containers instead of using *docker compose* directly.
 
 
 
-### docker-compose.xxx.yml files
+### compose/xxx.yml files
 
-`./doc` first looks for the available `docker-compose.*.yml` files. Each file represents one container:
+`./doc` first looks for the available `compose/*.yml` files. Each file represents one container:
 
 ```
-docker-compose.php.yml
-docker-compose.mysql.yml
-docker-compose.redis.yml
-docker-compose.mailhog.yml
-docker-compose.selenium.yml
+mailpit.yml
+mariadb.yml
+mysql.yml
+nginx.yml
+php.yml
+postgres.yml
+redis.yml
+seleniumchrome.yml
 ```
 
 It then checks with `.env` to see which ones are enabled - via corresponding `xxx_CONTAINER=true` values:
 
 ```
-PHP_CONTAINER=true
+MAILPIT_CONTAINER=false
+MARIADB_CONTAINER=false
 MYSQL_CONTAINER=false
+NGINX_CONTAINER=false
+PHP_CONTAINER=true
+POSTGRES_CONTAINER=false
 REDIS_CONTAINER=false
-MAILHOG_CONTAINER=false
-SELENIUM_CONTAINER=false
+SELENIUMCHROME_CONTAINER=false
 ```
 
-> Extra containers can be added by adding a `docker-compose.xxx.yml` file and a corresponding `xxx_CONTAINER=true` value to the `.env` file. They will be picked up automatically.
+> Extra containers can be added by adding a `compose/xxx.yml` file and a corresponding `xxx_CONTAINER=true` value to the `.env` file. They will be picked up automatically when using `./doc`.
 
-It then passes execution to *docker-compose*, passing the enabled .yml configuration files:
+It then passes execution to *docker compose*, passing the enabled .yml configuration files:
 
 ``` bash
 # this command
 ./doc ps
 # will run
-docker-compose -f docker-compose.php.yml -f docker-compose.mysql.yml ps
-# (if the PHP and MySQL containers are the ones that are enabled)
+docker compose --project-directory=. -f compose/php.yml ps
+# (if the PHP container is the one that's enabled)
 ```
 
 
 
 ### Interacting With Containers
 
-- All regular *docker-compose* commands are passed through to *docker-compose*. e.g.
+- All regular *docker compose* commands are passed through to *docker compose*. e.g.
   - Build the containers: `./doc up -d --build`
   - Stop containers: `./doc stop`
   - Show container status: `./doc ps`
@@ -99,6 +107,8 @@ docker-compose -f docker-compose.php.yml -f docker-compose.mysql.yml ps
 
 Choose the PHP version and pick other settings in the `.env` file.
 
+
+
 #### The *www-data* User's UID and GID 
 
 You have the option of setting the *www-data* user's *uid* and *gid* in the PHP container.
@@ -117,21 +127,45 @@ When inside the PHP container, you can open the MySQL client and connect straigh
 
 
 
-### The MySQL (or MariaDB) Container
+### The MailPit Container
 
-The `mysql:latest` image is used by default. You can use MariaDB instead by setting `MYSQL_IMAGE=mariadb:latest` in the `.env` file.
+Uses the `axllent/mailpit:latest` image by default but you can change this in the `.env` file.
+
+
+
+### The MariaDB Container
+
+Uses the `mariadb:10` image by default but you can change this in the `.env` file.
+
+
+
+### The MySQL Container
+
+Uses the `mysql:8.0` image by default but you can change this in the `.env` file.
+
+
+
+### The Nginx Container
+
+Uses the `nginx:1-alpine-slim` image by default but you can change this in the `.env` file.
+
+
+
+### The PHP Container
+
+Uses the `php:8.2-fpm` image by default but you can change this in the `.env` file.
+
+
+
+### The PostgreSQL Container
+
+Uses the `postgres:15-alpine` image by default but you can change this in the `.env` file.
 
 
 
 ### The Redis Container
 
-Uses the `redis:latest` image by default but you can change this in the `.env` file.
-
-
-
-### The MailHog Container
-
-Uses the `mailhog/mailhog:latest` image by default but you can change this in the `.env` file.
+Uses the `redis:alpine` image by default but you can change this in the `.env` file.
 
 
 

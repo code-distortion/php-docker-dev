@@ -5,27 +5,21 @@ services:
     build:
       context: './build/php'
       args:
-        - PHP_IMAGE=${PHP_IMAGE:-php:8.2.1-fpm}
+        - PHP_IMAGE=${PHP_IMAGE:-php:8.2-fpm}
         - SET_WWW_DATA_USER=${SET_WWW_DATA_USER:-true}
         - WWW_DATA_UID=${WWW_DATA_UID:-1000}
         - WWW_DATA_GID=${WWW_DATA_GID:-1000}
         - GIT_USER=${GIT_USER:-Your Name}
         - GIT_EMAIL=${GIT_EMAIL:-your@email.com}
-        - PHP_INSTALL_XDEBUG=${PHP_INSTALL_XDEBUG:-false}
-        - PHP_INSTALL_PCOV=${PHP_INSTALL_PCOV:-true}
+        - PHP_INSTALL_CHROMIUM=${PHP_INSTALL_CHROMIUM:-false}
         - PHP_INSTALL_COMPOSER=${PHP_INSTALL_COMPOSER:-true}
         - PHP_INSTALL_NPM=${PHP_INSTALL_NPM:-false}
         - PHP_INSTALL_MYSQL_CLIENT=${PHP_INSTALL_MYSQL_CLIENT:-true}
+        - PHP_INSTALL_PCOV=${PHP_INSTALL_PCOV:-true}
         - PHP_INSTALL_POSTGRES_CLIENT=${PHP_INSTALL_POSTGRES_CLIENT:-false}
-        - PHP_POSTGRES_CLIENT_VERSION=${PHP_POSTGRES_CLIENT_VERSION:-postgresql-client-14}
         - PHP_INSTALL_REDIS=${PHP_INSTALL_REDIS:-true}
-        - PHP_INSTALL_APACHE2_UTILS=${PHP_INSTALL_APACHE2_UTILS:-true}
-        - PHP_INSTALL_GZIP=${PHP_INSTALL_GZIP:-true}
-        - PHP_INSTALL_ZIP=${PHP_INSTALL_ZIP:-true}
-        - PHP_INSTALL_GIT=${PHP_INSTALL_GIT:-true}
-        - PHP_INSTALL_VIM=${PHP_INSTALL_VIM:-true}
-        - PHP_INSTALL_WGET=${PHP_INSTALL_WGET:-true}
-        - PHP_INSTALL_CHROMIUM=${PHP_INSTALL_CHROMIUM:-false}
+        - PHP_INSTALL_XDEBUG=${PHP_INSTALL_XDEBUG:-false}
+        - PHP_POSTGRES_CLIENT_VERSION=${PHP_POSTGRES_CLIENT_VERSION:-postgresql-client-14}
     environment:
       - PHP_SERVE_WEB_ROOT=${PHP_SERVE_WEB_ROOT:-/var/www/html}
       - PHP_SERVE_USING_PHP=${PHP_SERVE_USING_PHP:-false}

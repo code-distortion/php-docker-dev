@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # grab the current host user's uid and gid
-# pass them as environment variables to docker-compose
+# pass them as environment variables to docker compose
 export WWW_DATA_UID=${WWW_DATA_UID:-$UID}
 export WWW_DATA_GID=${WWW_DATA_GID:-$(id -g)}
 
@@ -68,9 +68,9 @@ find_containers () {
 # build the list of config files to include
 build_config_file_list () {
 
-    if [ -f "docker-compose.yml" ]; then
-        echo -n "-f compose/docker-compose.yml "
-    fi
+#    if [ -f "docker-compose.yml" ]; then
+#        echo -n "-f compose/docker-compose.yml "
+#    fi
 
     local CONTAINER
     for CONTAINER in "${ENABLED_CONTAINERS[@]}"; do
@@ -93,7 +93,7 @@ run_command () {
     exit "${RETURN}"
 }
 
-# run a docker-compose command
+# run a docker compose command
 run_docker_compose_command () {
     local CONFIG_FILES=$(build_config_file_list)
     run_command docker compose --project-directory=. ${CONFIG_FILES} "$@"
@@ -217,7 +217,7 @@ enter_container_or_run_command () {
 
 ### script start
 
-# change directory so the docker-compose.xxx.yml files can be found
+# change directory so the xxx.yml files can be found
 CURRENT_SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 cd "${CURRENT_SCRIPT_DIR}" || exit
 
@@ -237,5 +237,5 @@ fi
 # 2. either enter into a particular container, or execute something in it - if requested
 enter_container_or_run_command "$@"
 
-# 3. or just pass the command through to docker-compose
+# 3. or just pass the command through to docker compose
 run_docker_compose_command ${ORIG_ARGS}

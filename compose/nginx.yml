@@ -5,7 +5,7 @@ services:
     build:
       context: './build/nginx'
       args:
-        - NGINX_IMAGE=${NGINX_IMAGE:-nginx}
+        - NGINX_IMAGE=${NGINX_IMAGE:-nginx:1-alpine-slim}
     environment:
       - NGINX_WEB_ROOT=${NGINX_WEB_ROOT:-/var/www/html}
       - NGINX_HTTP_PORT=${NGINX_HTTP_PORT:-80}

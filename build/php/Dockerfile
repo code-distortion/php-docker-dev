@@ -20,22 +20,23 @@ RUN if [ ${SET_WWW_DATA_USER} = true ]; then \
 
 
 
-# ====== some general programs ======
-RUN apt-get install -y \
-    procps \
-    supervisor \
-    gettext \
-    ;
-
-
 # ====== PHP extensions ======
 RUN apt-get install -y \
+        apache2-utils \
+        git \
+        gettext \
+        gzip \
         libfreetype6-dev \
         libicu-dev \
         libjpeg62-turbo-dev \
         libmcrypt-dev \
         libpng-dev \
         libzip-dev \
+#        procps \
+        supervisor \
+        vim \
+        wget \
+        zip \
         zlib1g-dev \
     && docker-php-ext-configure gd --with-jpeg \
     && docker-php-ext-install -j$(nproc) gd \
@@ -46,13 +47,8 @@ RUN apt-get install -y \
     && docker-php-ext-install pdo_mysql \
     && docker-php-ext-install pcntl \
     && docker-php-ext-install zip \
+    && rm -rf /var/lib/apt/lists/* && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
     ;
-
-
-
-# ====== wget ======
-ARG PHP_INSTALL_WGET
-RUN if [ "$PHP_INSTALL_WGET" = true ]; then apt-get install -y wget ;fi
 
 
 
@@ -96,8 +92,9 @@ RUN if [ "$PHP_INSTALL_NPM" = true ]; then nvm install lts/fermium ;fi
 # ====== mysql-client ======
 ARG PHP_INSTALL_MYSQL_CLIENT
 RUN if [ "$PHP_INSTALL_MYSQL_CLIENT" = true ]; then \
-    apt-get update --allow-releaseinfo-change-suite && \
-    apt-get install -y default-mysql-client \
+    apt-get update --allow-releaseinfo-change-suite \
+    && apt-get install -y default-mysql-client \
+    && rm -rf /var/lib/apt/lists/* && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
 ;fi
 
 
@@ -117,6 +114,7 @@ RUN if [ "$PHP_INSTALL_POSTGRES_CLIENT" = true ]; then \
     && docker-php-ext-install pgsql \
     && docker-php-ext-install pdo_pgsql \
     && docker-php-ext-enable pdo_pgsql \
+    && rm -rf /var/lib/apt/lists/* && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
 ;fi
 
 
@@ -132,39 +130,12 @@ RUN if [ "$PHP_INSTALL_COMPOSER" = true ]; then \
 
 
 
-# ====== apache2-utils ======
-ARG PHP_INSTALL_APACHE2_UTILS
-RUN if [ "$PHP_INSTALL_APACHE2_UTILS" = true ]; then apt-get install -y apache2-utils ;fi
-
-
-
-# ====== gzip ======
-ARG PHP_INSTALL_GZIP
-RUN if [ "$PHP_INSTALL_GZIP" = true ]; then apt-get install -y gzip ;fi
-
-
-
-# ====== zip ======
-ARG PHP_INSTALL_ZIP
-RUN if [ "$PHP_INSTALL_ZIP" = true ]; then apt-get install -y zip ;fi
-
-
-
 # ====== Git ======
-ARG PHP_INSTALL_GIT
 ARG GIT_USER
 ARG GIT_EMAIL
-RUN if [ "$PHP_INSTALL_GIT" = true ]; then \
-    apt-get install -y git \
-    && git config --global user.email "$GIT_EMAIL" \
+RUN git config --global user.email "$GIT_EMAIL" \
     && git config --global user.name "$GIT_USER" \
-;fi
-
-
-
-# ====== Vim ======
-ARG PHP_INSTALL_VIM
-RUN if [ "$PHP_INSTALL_VIM" = true ]; then apt-get install -y vim ;fi
+    ;
 
 
 
@@ -176,15 +147,16 @@ RUN if [ "$PHP_INSTALL_CHROMIUM" = true ]; then \
     # for chromedriver...
     libnss3 \
     libdbus-1-3 \
+    && rm -rf /var/lib/apt/lists/* && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
 ;fi
 
 
 
 # ====== remove things that aren't needed anymore ======
-RUN apt-get -y autoremove \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
-    ;
+#RUN apt-get -y autoremove \
+#    && apt-get clean \
+#    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
+#    ;
 
 
 
@@ -205,7 +177,8 @@ COPY configs/ssh_config /etc/ssh/ssh_config
 COPY configs/supervisord.laravel-serve.conf /etc/supervisor/conf.d/supervisord.laravel-serve.template.conf
 COPY configs/supervisord.php-serve.conf /etc/supervisor/conf.d/supervisord.php-serve.template.conf
 
-COPY configs/php.ini /usr/local/etc/php/conf.d/php.ini
+COPY configs/ini/1.php.ini /usr/local/etc/php/conf.d/
+COPY configs/ini/xdebug.ini /usr/local/etc/php/conf.d/
 
 COPY configs/www.conf /usr/local/etc/php-fpm.d/www.conf
 

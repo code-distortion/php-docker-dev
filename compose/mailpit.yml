@@ -1,0 +1,7 @@
+version: '3.7'
+services:
+
+  mailpit:
+    image: '${MAILPIT_IMAGE:-axllent/mailpit:latest}'
+    ports:
+      - "127.0.0.1:${MAILPIT_DASHBOARD_EXPOSE_PORT:-8025}:8025"
