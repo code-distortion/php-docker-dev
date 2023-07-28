@@ -5,7 +5,7 @@
 export WWW_DATA_UID=${WWW_DATA_UID:-$UID}
 export WWW_DATA_GID=${WWW_DATA_GID:-$(id -g)}
 
-WWW_DATA_CONTAINERS=("php")
+WWW_DATA_CONTAINERS=("php" "php-old")
 declare -A POSSIBLE_CONTAINERS
 declare -A ENABLED_CONTAINERS
 
@@ -51,11 +51,14 @@ find_containers () {
     do
         CONTAINER="${FILE%.yml}" # remove ".yml"
 
+        local ENV_NAME="${CONTAINER/-/_}" # swap
+        ENV_NAME="${ENV_NAME^^}_CONTAINER"
+
         # track all of the POSSIBLE containers
         POSSIBLE_CONTAINERS["${CONTAINER}"]="${CONTAINER}"
 
         # check if XYZ_CONTAINER is enabled via the .env file
-        ENV_VALUE=$(read_dot_env ../.env "${CONTAINER^^}_CONTAINER")
+        ENV_VALUE=$(read_dot_env ../.env "${ENV_NAME}")
         if [[ "${ENV_VALUE,,}" = true ]]; then
             # track all of the ENABLED containers
             ENABLED_CONTAINERS["${CONTAINER}"]="${CONTAINER}"
