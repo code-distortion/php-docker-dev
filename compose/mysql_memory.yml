@@ -1,0 +1,23 @@
+version: '3.7'
+services:
+
+  mysql_memory:
+    image: '${MYSQL_MEMORY_IMAGE:-mysql:8.0}'
+    environment:
+      MYSQL_ROOT_PASSWORD: '${MYSQL_MEMORY_ROOT_PASSWORD:-}'
+      MYSQL_DATABASE: '${MYSQL_MEMORY_DATABASE:-db}'
+      MYSQL_USER: '${MYSQL_MEMORY_USER:-db}'
+      MYSQL_PASSWORD: '${MYSQL_MEMORY_PASSWORD:-}'
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+    ports:
+      - '127.0.0.1:${MYSQL_MEMORY_EXPOSE_PORT:-}:3307'
+    expose:
+      - 3307
+    tmpfs:
+      - /var/lib/mysql
+#    volumes:
+#      - ./volumes/mysql:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-p${MYSQL_MEMORY_PASSWORD:-}"]
+      retries: 3
+      timeout: 5s

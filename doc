@@ -160,8 +160,8 @@ pick_user () {
     fi
 }
 
-# jump into the database
-enter_database () {
+# jump into the mysql database
+enter_mysql_database () {
     if [ $# -eq 1 ] && [ "$1" = 'db' ]; then
 
         if [[ -z "${ENABLED_CONTAINERS['mysql']+unset}" ]]; then
@@ -181,6 +181,28 @@ enter_database () {
         fi
     fi
 }
+
+# jump into the mysql_memory database
+enter_mysql_memory_database () {
+    if [ $# -eq 1 ] && [ "$1" = 'db-memory' ]; then
+
+        if [[ -z "${ENABLED_CONTAINERS['mysql_memory']+unset}" ]]; then
+            die "The \"mysql_memory\" container has not been enabled - enable via the .env file"
+        fi
+
+        local DATABASE=$(read_dot_env .env "MYSQL_MEMORY_DATABASE")
+        if [ -z "${DATABASE}" ]; then
+            DATABASE="${DEFAULT_DATABASE}"
+        fi
+
+        local PASSWORD=$(read_dot_env .env "MYSQL_MEMORY_ROOT_PASSWORD")
+        if [ -z "${PASSWORD}" ]; then
+            run_docker_compose_command exec mysql_memory mysql --user=root "${DATABASE}" -A
+        else
+            run_docker_compose_command exec mysql_memory mysql --user=root --password="${PASSWORD}" "${DATABASE}" -A
+        fi
+    fi
+}   
 
 # either enter into a particular container, or execute something in it
 enter_container_or_run_command () {
@@ -227,8 +249,11 @@ cd "${CURRENT_SCRIPT_DIR}" || exit
 init_check
 find_containers
 
-# 1. jump into the database - if requested
-enter_database "$@"
+# jump into the mysql database - if requested
+enter_mysql_database "$@"
+
+# jump into the mysql_memory database - if requested
+enter_mysql_memory_database "$@"
 
 # check if sudo is desired
 ORIG_ARGS=$* # record the original arguments
