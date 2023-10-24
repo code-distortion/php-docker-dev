@@ -124,8 +124,6 @@ ARG PHP_INSTALL_COMPOSER
 RUN if [ "$PHP_INSTALL_COMPOSER" = true ]; then \
     set -o pipefail \
     && curl https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
-    && mkdir /var/www/.composer && chown www-data: /var/www/.composer \
-    && mkdir /var/www/.ssh && chown www-data: /var/www/.ssh \
 ;fi
 
 
@@ -166,8 +164,8 @@ RUN chown www-data: /var/log/php.log
 
 
 
-# ====== (.config dir for php artisan tinker) ======
-RUN mkdir /var/www/.config && chown www-data: /var/www/.config
+# ====== chown /var/www so that directories like /var/www/.ssh and /var/www/.config can be created as needed ======
+RUN chown www-data: /var/www
 
 
 
