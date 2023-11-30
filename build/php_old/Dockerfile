@@ -164,8 +164,9 @@ RUN chown www-data: /var/log/php.log
 
 
 
-# ====== chown /var/www so that directories like /var/www/.ssh and /var/www/.config can be created as needed ======
-RUN chown www-data: /var/www/.config
+# ====== chown these directories so programs can create necessary cache directories etc as needed ======
+RUN chown www-data: /var/www
+RUN mkdir /tmp/phpstan/ && chown www-data: /tmp/phpstan/
 
 
 
