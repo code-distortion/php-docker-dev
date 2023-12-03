@@ -5,7 +5,7 @@
 export WWW_DATA_UID=${WWW_DATA_UID:-$UID}
 export WWW_DATA_GID=${WWW_DATA_GID:-$(id -g)}
 
-WWW_DATA_CONTAINERS=("php" "php-old")
+WWW_DATA_CONTAINERS=("php" "php-old" "python")
 declare -A POSSIBLE_CONTAINERS
 declare -A ENABLED_CONTAINERS
 

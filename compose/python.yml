@@ -1,0 +1,10 @@
+version: '3.7'
+services:
+
+  python:
+    build:
+      context: './build/python'
+      args:
+        - PYTHON_IMAGE=${PYTHON_IMAGE:-python:latest}
+    volumes:
+      - ./build/python/profile.d:/etc/profile.d
