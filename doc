@@ -20,103 +20,101 @@ NC='\033[0m'
 
 # end the script with an error message
 die () {
-    echo -e "\n${RED}ERROR${NC}: $*\n"
-    exit 1;
+  echo -e "\n${RED}ERROR${NC}: $*\n"
+  exit 1;
 }
 
 # check things needed for this script to run
 init_check () {
 
-    # ensure that Docker is running
-    if ! docker info > /dev/null 2>&1; then
-        die "Docker is not running"
-        exit 1
-    fi
+  # ensure that Docker is running
+  if ! docker info > /dev/null 2>&1; then
+    die "Docker is not running"
+    exit 1
+  fi
 
-    # check to make sure the .env file exists
-    if [[ ! -f .env ]]; then
-        die "The \".env\" file does not exist - make a copy of \".env.example\""
-    fi
+  # check to make sure the .env file exists
+  if [[ ! -f .env ]]; then
+    die "The \".env\" file does not exist - make a copy of \".env.example\""
+  fi
 }
 
 # build the list of enabled containers
 find_containers () {
+  local CONTAINER
+  local ENV_VALUE
 
-    local CONTAINER
-    local ENV_VALUE
+  cd compose
 
-    cd compose
+  for FILE in *.yml
+  do
+    CONTAINER="${FILE%.yml}" # remove ".yml"
+    CONTAINER="${CONTAINER/-/_}" # swap _ for -
 
-    for FILE in *.yml
-    do
-        CONTAINER="${FILE%.yml}" # remove ".yml"
+    local ENV_NAME="${CONTAINER}_CONTAINER"
+    ENV_NAME="${ENV_NAME^^}"
 
-        local ENV_NAME="${CONTAINER/-/_}" # swap
-        ENV_NAME="${ENV_NAME^^}_CONTAINER"
+    # track all of the POSSIBLE containers
+    POSSIBLE_CONTAINERS["${CONTAINER}"]="${CONTAINER}"
 
-        # track all of the POSSIBLE containers
-        POSSIBLE_CONTAINERS["${CONTAINER}"]="${CONTAINER}"
+    # check if XYZ_CONTAINER is enabled via the .env file
+    ENV_VALUE=$(read_dot_env ../.env "${ENV_NAME}")
+    if [[ "${ENV_VALUE,,}" = true ]]; then
+      # track all of the ENABLED containers
+      ENABLED_CONTAINERS["${CONTAINER}"]="${CONTAINER}"
+    fi
+  done
 
-        # check if XYZ_CONTAINER is enabled via the .env file
-        ENV_VALUE=$(read_dot_env ../.env "${ENV_NAME}")
-        if [[ "${ENV_VALUE,,}" = true ]]; then
-            # track all of the ENABLED containers
-            ENABLED_CONTAINERS["${CONTAINER}"]="${CONTAINER}"
-        fi
-    done
-
-    cd ..
+  cd ..
 }
 
 # build the list of config files to include
 build_config_file_list () {
 
-#    if [ -f "docker-compose.yml" ]; then
-#        echo -n "-f compose/docker-compose.yml "
-#    fi
+#  if [ -f "docker-compose.yml" ]; then
+#    echo -n "-f compose/docker-compose.yml "
+#  fi
 
-    local CONTAINER
-    for CONTAINER in "${ENABLED_CONTAINERS[@]}"; do
-        echo -n "-f compose/${CONTAINER}.yml "
-    done
+  local CONTAINER
+  for CONTAINER in "${ENABLED_CONTAINERS[@]}"; do
+    echo -n "-f compose/${CONTAINER}.yml "
+  done
 
-    echo
+  echo
 }
 
 # run a command and exit
 run_command () {
-    echo -e "\n${GREEN}COMMAND${NC}: $*\n"
+  echo -e "\n${GREEN}COMMAND${NC}: $*\n"
 
-    local RETURN
-    "$@"
-    RETURN="$?"
+  local RETURN
+  "$@"
+  RETURN="$?"
 
-    echo
+  echo
 
-    exit "${RETURN}"
+  exit "${RETURN}"
 }
 
 # run a docker compose command
 run_docker_compose_command () {
-    local CONFIG_FILES=$(build_config_file_list)
-    run_command docker compose --project-directory=. ${CONFIG_FILES} "$@"
+  local CONFIG_FILES=$(build_config_file_list)
+  run_command docker compose --project-directory=. ${CONFIG_FILES} "$@"
 }
 
 # read a value from a .env file
 read_dot_env () {
+  local FILE="$1"
+  local SEARCH="$2"
 
-    local FILE="$1"
-    local SEARCH="$2"
-
-    local LINES=$(grep -E '^[ ]*[^#]' "${FILE}")
-    local VAR=$(echo "${LINES}" | grep "${SEARCH}=" | xargs)
-    IFS="=" read -ra VAR <<< "$VAR"
-    echo "${VAR[1]}"
+  local LINES=$(grep -E '^[ ]*[^#]' "${FILE}")
+  local VAR=$(echo "${LINES}" | grep "${SEARCH}=" | xargs)
+  IFS="=" read -ra VAR <<< "$VAR"
+  echo "${VAR[1]}"
 }
 
 # check if an array contains a particular value
 array_contains () {
-
   SEARCH="$1"
   ARRAY=("${!2}")
 
@@ -133,107 +131,117 @@ array_contains () {
   return 1 # i.e. error
 }
 
+# clean a container name
+clean_container_name () {
+  local CONTAINER="$1"
+  CONTAINER="${CONTAINER/-/_}" # swap _ for -
+  echo "${CONTAINER}"
+}
+
 # resolve a container name
 resolve_container_name () {
-    if array_contains "$1" POSSIBLE_CONTAINERS[@]; then
-        echo "$1"
-        return
-    fi
+  if array_contains "$1" POSSIBLE_CONTAINERS[@]; then
+    echo "${CONTAINER}"
+    return
+  fi
 }
 
 # check if a container is enabled
 is_container_enabled () {
-    if array_contains "$1" ENABLED_CONTAINERS[@]; then
-        echo true
-    fi
+  if array_contains "$1" ENABLED_CONTAINERS[@]; then
+    echo true
+  fi
 }
 
 # determine which user to bash in with
 pick_user () {
-    local CONTAINER="$1"
-    local SUDO_REQUESTED="$2"
+  local CONTAINER="$1"
+  local SUDO_REQUESTED="$2"
 
-    if [ "${SUDO_REQUESTED}" ] || ! array_contains "$1" WWW_DATA_CONTAINERS[@]; then
-        echo "root"
-    else
-        echo "www-data"
-    fi
+
+  if [ "${SUDO_REQUESTED}" ] || ! array_contains "${CONTAINER}" WWW_DATA_CONTAINERS[@]; then
+    echo "root"
+  else
+    echo "www-data"
+  fi
 }
 
 # jump into the mysql database
 enter_mysql_database () {
-    if [ $# -eq 1 ] && [ "$1" = 'db' ]; then
+  if [ "$#" -eq 1 ] && [ "$1" = 'db' ]; then
 
-        if [[ -z "${ENABLED_CONTAINERS['mysql']+unset}" ]]; then
-            die "The \"mysql\" container has not been enabled - enable via the .env file"
-        fi
-
-        local DATABASE=$(read_dot_env .env "MYSQL_DATABASE")
-        if [ -z "${DATABASE}" ]; then
-            DATABASE="${DEFAULT_DATABASE}"
-        fi
-
-        local PASSWORD=$(read_dot_env .env "MYSQL_ROOT_PASSWORD")
-        if [ -z "${PASSWORD}" ]; then
-            run_docker_compose_command exec mysql mysql --user=root "${DATABASE}" -A
-        else
-            run_docker_compose_command exec mysql mysql --user=root --password="${PASSWORD}" "${DATABASE}" -A
-        fi
+    local CONTAINER="mysql"
+    if [[ -z $(is_container_enabled "${CONTAINER}") ]]; then
+      die "The \"${CONTAINER}\" container has not been enabled - enable via the .env file"
     fi
+
+    local DATABASE=$(read_dot_env .env "MYSQL_DATABASE")
+    if [ -z "${DATABASE}" ]; then
+      DATABASE="${DEFAULT_DATABASE}"
+    fi
+
+    local PASSWORD=$(read_dot_env .env "MYSQL_ROOT_PASSWORD")
+    if [ -z "${PASSWORD}" ]; then
+      run_docker_compose_command exec "${CONTAINER}" mysql --user=root "${DATABASE}" -A
+    else
+      run_docker_compose_command exec "${CONTAINER}" mysql --user=root --password="${PASSWORD}" "${DATABASE}" -A
+    fi
+  fi
 }
 
 # jump into the mysql_memory database
 enter_mysql_memory_database () {
-    if [ $# -eq 1 ] && [ "$1" = 'db-memory' ]; then
+  if [ "$#" -eq 1 ] && { [ "$1" = 'db-memory' ] || [ "$1" = 'memory-db' ]; }; then
 
-        if [[ -z "${ENABLED_CONTAINERS['mysql_memory']+unset}" ]]; then
-            die "The \"mysql_memory\" container has not been enabled - enable via the .env file"
-        fi
-
-        local DATABASE=$(read_dot_env .env "MYSQL_MEMORY_DATABASE")
-        if [ -z "${DATABASE}" ]; then
-            DATABASE="${DEFAULT_DATABASE}"
-        fi
-
-        local PASSWORD=$(read_dot_env .env "MYSQL_MEMORY_ROOT_PASSWORD")
-        if [ -z "${PASSWORD}" ]; then
-            run_docker_compose_command exec mysql_memory mysql --user=root "${DATABASE}" -A
-        else
-            run_docker_compose_command exec mysql_memory mysql --user=root --password="${PASSWORD}" "${DATABASE}" -A
-        fi
+    local CONTAINER="mysql_memory"
+    if [[ -z $(is_container_enabled "${CONTAINER}") ]]; then
+      die "The \"${CONTAINER}\" container has not been enabled - enable via the .env file"
     fi
+
+    local DATABASE=$(read_dot_env .env "MYSQL_MEMORY_DATABASE")
+    if [ -z "${DATABASE}" ]; then
+      DATABASE="${DEFAULT_DATABASE}"
+    fi
+
+    local PASSWORD=$(read_dot_env .env "MYSQL_MEMORY_ROOT_PASSWORD")
+    if [ -z "${PASSWORD}" ]; then
+      run_docker_compose_command exec "${CONTAINER}" mysql --user=root "${DATABASE}" -A
+    else
+      run_docker_compose_command exec "${CONTAINER}" mysql --user=root --password="${PASSWORD}" "${DATABASE}" -A
+    fi
+  fi
 }   
 
 # either enter into a particular container, or execute something in it
 enter_container_or_run_command () {
+  local CONTAINER="$1"
+  CONTAINER=$(clean_container_name "${CONTAINER}")
+  CONTAINER=$(resolve_container_name "${CONTAINER}")
 
-    local CONTAINER="$1"
-    CONTAINER=$(resolve_container_name "${CONTAINER}")
+  if [[ -n "${CONTAINER}" ]]; then
 
-    if [[ -n "${CONTAINER}" ]]; then
-
-        if [[ -z $(is_container_enabled "${CONTAINER}") ]]; then
-            die "The \"${CONTAINER}\" container has not been enabled - enable via the .env file"
-        fi
-
-        USER=$(pick_user "${CONTAINER}" "${SUDO_REQUESTED}")
-
-        # bash into the container
-        if [ $# -eq 1 ]; then
-            run_docker_compose_command exec --user="${USER}" "${CONTAINER}" bash --login
-        # or run a command in the container
-        else
-            shift 1
-
-            # execute a "php artisan" command
-            if [[ $1 == "pa" ]]; then
-                shift 1
-                run_docker_compose_command exec --user="${USER}" "${CONTAINER}" php artisan "$@"
-            fi
-
-            run_docker_compose_command exec --user="${USER}" "${CONTAINER}" "$@"
-        fi
+    if [[ -z $(is_container_enabled "${CONTAINER}") ]]; then
+      die "The \"${CONTAINER}\" container has not been enabled - enable via the .env file"
     fi
+
+    USER=$(pick_user "${CONTAINER}" "${SUDO_REQUESTED}")
+
+    # bash into the container
+    if [ "$#" -eq 1 ]; then
+      run_docker_compose_command exec --user="${USER}" "${CONTAINER}" bash --login
+    # or run a command in the container
+    else
+      shift 1
+
+      # execute a "php artisan" command
+      if [[ "$1" == "pa" ]]; then
+        shift 1
+        run_docker_compose_command exec --user="${USER}" "${CONTAINER}" php artisan "$@"
+      fi
+
+      run_docker_compose_command exec --user="${USER}" "${CONTAINER}" "$@"
+    fi
+  fi
 }
 
 
@@ -258,8 +266,8 @@ enter_mysql_memory_database "$@"
 # check if sudo is desired
 ORIG_ARGS=$* # record the original arguments
 if [[ "$1" == "sudo" ]]; then
-    SUDO_REQUESTED=true
-    shift 1 # remove "sudo" from the arguments
+  SUDO_REQUESTED=true
+  shift 1 # remove "sudo" from the arguments
 fi
 
 # 2. either enter into a particular container, or execute something in it - if requested
