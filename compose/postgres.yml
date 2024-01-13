@@ -14,3 +14,4 @@ services:
 #      - /var/lib/postgresql/data
     volumes:
       - ./volumes/postgres:/var/lib/postgresql/data
+      - ./build/postgres/profile.d:/etc/profile.d

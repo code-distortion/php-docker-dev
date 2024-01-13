@@ -15,8 +15,10 @@ services:
       - 3307
     tmpfs:
       - /var/lib/mysql
-#    volumes:
+    volumes:
 #      - ./volumes/mysql:/var/lib/mysql
+      - ./volumes/mysql_shared:/shared
+      - ./build/mysql_memory/profile.d:/etc/profile.d
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-p${MYSQL_MEMORY_PASSWORD:-}"]
       retries: 3

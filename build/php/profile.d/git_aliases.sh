@@ -15,10 +15,8 @@ alias gmm="git merge master"
 alias gpf="git push --force"
 
 function gamend {
-  WHAT="${1}"
-  if [[ "${WHAT}" != '' ]]; then
-    git add "${WHAT}"
+  if (( "$#" != 0 )); then
+    git add $@
   fi
   git commit --amend --no-edit
 }
-

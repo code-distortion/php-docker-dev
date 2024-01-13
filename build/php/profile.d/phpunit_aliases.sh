@@ -5,4 +5,3 @@ alias phpunit-skip='./vendor/bin/phpunit --stop-on-error --stop-on-failure --dis
 alias phpunit-quarantined='./vendor/bin/phpunit --stop-on-error --stop-on-failure --display-deprecations --display-notices --display-warnings --group=quarantined'
 alias t='phpunit'
 alias infection='./vendor/bin/infection --threads=max --show-mutations'
-

@@ -17,6 +17,8 @@ services:
 #      - /var/lib/mysql
     volumes:
       - ./volumes/mariadb:/var/lib/mysql
+      - ./volumes/mysql_shared:/shared
+      - ./build/mariadb/profile.d:/etc/profile.d
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-p${MARIADB_PASSWORD:-}"]
       retries: 3
