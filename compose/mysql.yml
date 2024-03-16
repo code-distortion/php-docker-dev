@@ -17,7 +17,8 @@ services:
 #      - /var/lib/mysql
     volumes:
       - ./volumes/mysql:/var/lib/mysql
-      - ./volumes/mysql_shared:/shared
+      - ./volumes/shared:/shared
+      - ./build/mysql/configuration/my.cnf:/etc/mysql/my.cnf
       - ./build/mysql/profile.d:/etc/profile.d
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-p${MYSQL_PASSWORD:-}"]

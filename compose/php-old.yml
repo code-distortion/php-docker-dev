@@ -29,5 +29,6 @@ services:
     volumes:
       - ${PHP_VOLUME_SOURCE:-../}:/var/www/html
       - ./build/php_old/profile.d:/etc/profile.d
+      - ./volumes/shared:/shared
       - ${SSH_AGENT_PATH}:/ssh_agent
       - ./logs/php_old:/var/www/html/storage/logs
