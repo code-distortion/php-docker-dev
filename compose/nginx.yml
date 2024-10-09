@@ -22,6 +22,6 @@ services:
     extra_hosts:
       - 'host.docker.internal:host-gateway'
     volumes:
-      - ${NGINX_VOLUME_SOURCE:-../}:/var/www/html
+      - ${NGINX_VOLUME_SOURCE:-../public}:/var/www/html/public
       - ./build/nginx/certs:/etc/ssl/certs
       - ./logs/nginx:/var/log/nginx
