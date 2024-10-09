@@ -234,13 +234,28 @@ enter_container_or_run_command () {
     else
       shift 1
 
+      # check to see if the command is a "run" command, as opposed to an "exec" command
+      local METHOD='exec'
+      if [[ "$1" == "run" ]]; then
+        shift 1
+        local METHOD='run'
+      fi
+
       # execute a "php artisan" command
       if [[ "$1" == "pa" ]]; then
         shift 1
-        run_docker_compose_command exec --user="${USER}" "${CONTAINER}" php artisan "$@"
+        if [[ "${METHOD}" == "run" ]]; then
+          run_docker_compose_command run --rm --user="${USER}" "${CONTAINER}" php artisan "$@"
+        else
+          run_docker_compose_command exec --user="${USER}" "${CONTAINER}" php artisan "$@"
+        fi
       fi
 
-      run_docker_compose_command exec --user="${USER}" "${CONTAINER}" "$@"
+      if [[ "${METHOD}" == "run" ]]; then
+        run_docker_compose_command run --rm --user="${USER}" "${CONTAINER}" "$@"
+      else
+        run_docker_compose_command exec --user="${USER}" "${CONTAINER}" "$@"
+      fi
     fi
   fi
 }
