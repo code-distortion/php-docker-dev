@@ -5,7 +5,7 @@ services:
     build:
       context: './build/php'
       args:
-        - PHP_IMAGE=${PHP_IMAGE:-php:8.3.4-fpm-bookworm}
+        - PHP_IMAGE=${PHP_IMAGE:-php:8.3.12-fpm-bookworm}
         - SET_WWW_DATA_USER=${SET_WWW_DATA_USER:-true}
         - WWW_DATA_UID=${WWW_DATA_UID:-1000}
         - WWW_DATA_GID=${WWW_DATA_GID:-1000}
@@ -19,7 +19,7 @@ services:
         - PHP_INSTALL_POSTGRES_CLIENT=${PHP_INSTALL_POSTGRES_CLIENT:-false}
         - PHP_INSTALL_REDIS=${PHP_INSTALL_REDIS:-true}
         - PHP_INSTALL_XDEBUG=${PHP_INSTALL_XDEBUG:-false}
-        - PHP_POSTGRES_CLIENT_VERSION=${PHP_POSTGRES_CLIENT_VERSION:-postgresql-client-14}
+        - PHP_POSTGRES_CLIENT_VERSION=${PHP_POSTGRES_CLIENT_VERSION:-postgresql-client-17}
     environment:
       - PHP_SERVE_WEB_ROOT=${PHP_SERVE_WEB_ROOT:-/var/www/html}
       - PHP_SERVE_USING_PHP=${PHP_SERVE_USING_PHP:-false}

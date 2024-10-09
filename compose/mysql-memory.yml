@@ -2,7 +2,7 @@ version: '3.7'
 services:
 
   mysql_memory:
-    image: '${MYSQL_MEMORY_IMAGE:-mysql:8.0}'
+    image: '${MYSQL_MEMORY_IMAGE:-mysql:8.4}'
     environment:
       MYSQL_ROOT_PASSWORD: '${MYSQL_MEMORY_ROOT_PASSWORD:-}'
       MYSQL_DATABASE: '${MYSQL_MEMORY_DATABASE:-db}'
