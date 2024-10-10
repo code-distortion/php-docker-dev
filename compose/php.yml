@@ -28,6 +28,7 @@ services:
       - XDEBUG_CONFIG=${PHP_XDEBUG_CONFIG:-client_host=host.docker.internal xdebug.mode=develop,coverage,debug}
     ports:
       - "${NGINX_EXPOSE_TO_IP:-127.0.0.1}:${PHP_SERVE_HTTP_PORT:-}:80"
+      - "${NGINX_EXPOSE_TO_IP:-127.0.0.1}:${PHP_REVERB_PORT:-}:8080"
     extra_hosts:
       - 'host.docker.internal:host-gateway'
     volumes:
