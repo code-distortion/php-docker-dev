@@ -1,0 +1,24 @@
+services:
+
+  ollama:
+    image: '${OLLAMA_IMAGE:-ollama/ollama:latest}'
+    restart: unless-stopped
+    environment:
+#      - OLLAMA_HOST='0.0.0.0'  # uncomment to make ollama reachable by other computers on your network
+      - OLLAMA_KEEP_ALIVE=5m
+      - OLLAMA_FLASH_ATTENTION=0  # 1 is experimental as of 0.3.11
+    healthcheck:
+      test: ollama ps || exit 1
+      interval: 60s
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    cpus: '1.5'
+    ports:
+      - "${OLLAMA_EXPOSE_TO_IP:-127.0.0.1}:${OLLAMA_PORT:-}:11434"
+    volumes:
+      - ./volumes/ollama:/root/.ollama
