@@ -1,6 +1,9 @@
 #!/bin/bash
 
 alias pa="php artisan"
+pas() {
+  php artisan | grep --color=auto -i "$1"
+}
 
 app() {
   # if there is no argument, just run artisan and grep the results

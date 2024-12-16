@@ -1,6 +1,7 @@
 #!/bin/bash
 
-alias phpunit='./vendor/bin/phpunit --stop-on-error --stop-on-failure --display-deprecations --display-notices --display-warnings --exclude-group=skip,quarantined'
+#alias phpunit='./vendor/bin/phpunit --stop-on-error --stop-on-failure --display-deprecations --display-notices --display-warnings --exclude-group=skip,quarantined'
+alias phpunit='./vendor/bin/phpunit --stop-on-error --stop-on-failure --display-deprecations --display-notices --display-warnings --exclude-group=skip --exclude-group=quarantined'
 alias t='phpunit'
 alias tf='phpunit --filter'
 
