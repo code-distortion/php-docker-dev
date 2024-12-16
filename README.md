@@ -44,13 +44,16 @@ Use this to interact with the containers instead of using *docker compose* direc
 
 ```
 mailpit.yml
-mariadb.yml
+mariadb.yml 
 mysql.yml
+mysql-memory.yml
 nginx.yml
+node.yml
+ollama.yml
 php.yml
 postgres.yml
 redis.yml
-seleniumchrome.yml
+selenium-chrome.yml
 ```
 
 It then checks with `.env` to see which ones are enabled - via corresponding `xxx_CONTAINER=true` values:
@@ -59,11 +62,16 @@ It then checks with `.env` to see which ones are enabled - via corresponding `xx
 MAILPIT_CONTAINER=false
 MARIADB_CONTAINER=false
 MYSQL_CONTAINER=false
+MYSQL_MEMORY_CONTAINER=false
 NGINX_CONTAINER=false
+NODE_CONTAINER=false
+OLLAMA_CONTAINER=false
 PHP_CONTAINER=true
+PHP_OLD_CONTAINER=false
 POSTGRES_CONTAINER=false
+PYTHON_CONTAINER=false
 REDIS_CONTAINER=false
-SELENIUMCHROME_CONTAINER=false
+SELENIUM_CHROME_CONTAINER=false
 ```
 
 > Extra containers can be added by adding a `compose/xxx.yml` file and a corresponding `xxx_CONTAINER=true` value to the `.env` file. They will be picked up automatically when using `./doc`.
@@ -103,6 +111,10 @@ docker compose --project-directory=. -f compose/php.yml ps
 
 ## Available Containers
 
+You can change the image used for any container by updating your `.env` file.
+
+
+
 ### The PHP Container
 
 Choose the PHP version and pick other settings in the `.env` file.
@@ -129,49 +141,75 @@ When inside the PHP container, you can open the MySQL client and connect straigh
 
 ### The MailPit Container
 
-Uses the `axllent/mailpit:latest` image by default but you can change this in the `.env` file.
+Uses the `axllent/mailpit:latest` image.
 
 
 
 ### The MariaDB Container
 
-Uses the `mariadb:10` image by default but you can change this in the `.env` file.
+Uses the `mariadb:11.6.2` image.
 
 
 
 ### The MySQL Container
 
-Uses the `mysql:8.0` image by default but you can change this in the `.env` file.
+Uses the `mysql:8.4` image.
+
+
+
+### The MySQL-memory Container
+
+Uses the `mysql:8.4`image.
+
+Runs the container with the `/var/lib/mysql` as a *tmpfs* volume, which means the data is stored in memory and is lost when the container is stopped. Which is useful for running tests.
 
 
 
 ### The Nginx Container
 
-Uses the `nginx:1-alpine-slim` image by default but you can change this in the `.env` file.
+Uses the `nginx:1-alpine-slim` image.
+
+
+
+### The Node Container
+
+Uses the `node:23-bookworm` image.
+
+
+
+### The Ollama Container
+
+Uses the `ollama/ollama:latest` image.
 
 
 
 ### The PHP Container
 
-Uses the `php:8.2-fpm` image by default but you can change this in the `.env` file.
+Uses the `php:8.4.1-fpm-bookworm` image.
 
 
 
 ### The PostgreSQL Container
 
-Uses the `postgres:15-alpine` image by default but you can change this in the `.env` file.
+Uses the `postgres:17-alpine` image.
+
+
+
+### The Python Container
+
+Uses the `python:latest` image.
 
 
 
 ### The Redis Container
 
-Uses the `redis:alpine` image by default but you can change this in the `.env` file.
+Uses the `redis:alpine` image.
 
 
 
 ### The Selenium Container
 
-Uses the `selenium/standalone-chrome:latest` image by default but you can change this in the `.env` file.
+Uses the `selenium/standalone-chrome:latest` image.
 
 
 
