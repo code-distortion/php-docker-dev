@@ -5,5 +5,8 @@ services:
       context: './build/python'
       args:
         - PYTHON_IMAGE=${PYTHON_IMAGE:-python:latest}
+        - SET_WWW_DATA_USER=${SET_WWW_DATA_USER:-true}
+        - WWW_DATA_UID=${WWW_DATA_UID:-1000}
+        - WWW_DATA_GID=${WWW_DATA_GID:-1000}
     volumes:
       - ./build/python/profile.d:/etc/profile.d

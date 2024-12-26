@@ -2,6 +2,7 @@ ARG PYTHON_IMAGE
 FROM $PYTHON_IMAGE
 
 WORKDIR /app
+SHELL ["/bin/bash", "--login", "-c"]
 
 
 
@@ -21,6 +22,14 @@ RUN apt-get update \
     && apt-get clean && rm -rf /var/lib/apt/lists/* \
     ;
 
-RUN echo 'export PATH=$PATH:/www-data/scripts' >> "/root/.bashrc"
+
+
+COPY home/.bashrc /home/www-data/.bashrc
+COPY home/.bash_profile /home/www-data/.bash_profile
+RUN chown www-data:www-data /home/www-data
+
+RUN usermod -d /home/www-data www-data
+
+
 
 ENTRYPOINT ["tail", "-f", "/dev/null"]
