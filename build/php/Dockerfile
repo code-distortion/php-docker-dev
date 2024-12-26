@@ -2,7 +2,6 @@ ARG PHP_IMAGE
 FROM ${PHP_IMAGE}
 
 SHELL ["/bin/bash", "--login", "-c"]
-RUN apt-get update
 
 ENV TZ=UTC
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
@@ -21,7 +20,8 @@ RUN if [ ${SET_WWW_DATA_USER} = true ]; then \
 
 
 # ====== PHP extensions ======
-RUN apt-get install -y \
+RUN apt-get update \
+    && apt-get install -y \
         apache2-utils \
         git \
         gettext \
@@ -47,7 +47,7 @@ RUN apt-get install -y \
     && docker-php-ext-install pdo_mysql \
     && docker-php-ext-install pcntl \
     && docker-php-ext-install zip \
-    && rm -rf /var/lib/apt/lists/* && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
+    && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
     ;
 
 
