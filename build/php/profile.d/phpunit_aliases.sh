@@ -3,7 +3,7 @@
 #alias phpunit='./vendor/bin/phpunit --stop-on-error --stop-on-failure --display-deprecations --display-notices --display-warnings --exclude-group=skip,quarantined'
 alias phpunit='./vendor/bin/phpunit --stop-on-error --stop-on-failure --display-deprecations --display-notices --display-warnings --exclude-group=skip --exclude-group=quarantined'
 alias t='phpunit'
-alias tf='phpunit --filter'
+alias tf='./vendor/bin/phpunit --stop-on-error --stop-on-failure --display-deprecations --display-notices --display-warnings --filter'
 
 alias phpunit-skip='./vendor/bin/phpunit --stop-on-error --stop-on-failure --display-deprecations --display-notices --display-warnings --group=skip'
 alias s='phpunit-skip'
