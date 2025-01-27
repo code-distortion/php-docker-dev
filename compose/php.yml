@@ -37,3 +37,4 @@ services:
       - ./volumes/shared:/shared
       - ${SSH_AGENT_PATH}:/ssh_agent
       - ./logs/php:/var/www/html/storage/logs
+    working_dir: "${PHP_WORKING_DIR:-/var/www/html/}"
