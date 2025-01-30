@@ -203,6 +203,7 @@ RUN mkdir /tmp/phpstan/ && chown www-data: /tmp/phpstan/
 COPY configs/ssh_config /etc/ssh/ssh_config
 
 COPY configs/supervisord.laravel-serve.conf /etc/supervisor/conf.d/supervisord.laravel-serve.template.conf
+COPY configs/supervisord.tempest-serve.conf /etc/supervisor/conf.d/supervisord.tempest-serve.template.conf
 COPY configs/supervisord.php-serve.conf /etc/supervisor/conf.d/supervisord.php-serve.template.conf
 
 COPY configs/ini/1.php.ini /usr/local/etc/php/conf.d/

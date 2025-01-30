@@ -11,6 +11,11 @@ elif [ "$PHP_SERVE_USING_LARAVEL" = true ]; then
     envsubst < /etc/supervisor/conf.d/supervisord.laravel-serve.template.conf > /etc/supervisor/conf.d/supervisord.laravel-serve.conf
     /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.laravel-serve.conf
 
+# serve with PHP using Laravel
+elif [ "$PHP_SERVE_USING_TEMPEST" = true ]; then
+    envsubst < /etc/supervisor/conf.d/supervisord.tempest-serve.template.conf > /etc/supervisor/conf.d/supervisord.tempest-serve.conf
+    /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.tempest-serve.conf
+
 # serve with PHP-FPM
 else
     # @see https://github.com/devilbox/docker-php-fpm-8.0/blob/master/data/docker-php-entrypoint

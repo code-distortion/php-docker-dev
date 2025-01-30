@@ -19,16 +19,18 @@ services:
         - PHP_INSTALL_REDIS=${PHP_INSTALL_REDIS:-true}
         - PHP_INSTALL_XDEBUG=${PHP_INSTALL_XDEBUG:-false}
         - PHP_POSTGRES_CLIENT_VERSION=${PHP_POSTGRES_CLIENT_VERSION:-postgresql-client-17}
+        - PHP_SERVE_WEB_ROOT=${PHP_SERVE_WEB_ROOT:-/var/www/html}
     environment:
       - PHP_SERVE_WEB_ROOT=${PHP_SERVE_WEB_ROOT:-/var/www/html}
       - PHP_SERVE_USING_PHP=${PHP_SERVE_USING_PHP:-false}
       - PHP_SERVE_USING_LARAVEL=${PHP_SERVE_USING_LARAVEL:-false}
+      - PHP_SERVE_USING_TEMPEST=${PHP_SERVE_USING_TEMPEST:-false}
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-}
       - SSH_AUTH_SOCK=/ssh_agent
       - XDEBUG_CONFIG=${PHP_XDEBUG_CONFIG:-client_host=host.docker.internal xdebug.mode=develop,coverage,debug}
     ports:
-      - "${NGINX_EXPOSE_TO_IP:-127.0.0.1}:${PHP_SERVE_HTTP_PORT:-}:80"
-      - "${NGINX_EXPOSE_TO_IP:-127.0.0.1}:${PHP_REVERB_PORT:-}:8080"
+      - "${NGINX_EXPOSE_TO_IP:-127.0.0.1}:${NGINX_HTTP_PORT:-80}:80"
+      - "${NGINX_EXPOSE_TO_IP:-127.0.0.1}:${PHP_REVERB_PORT:-8080}:8080"
     extra_hosts:
       - 'host.docker.internal:host-gateway'
     volumes:

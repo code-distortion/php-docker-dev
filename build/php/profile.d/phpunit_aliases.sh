@@ -4,7 +4,7 @@
 
 # aliases for the current version of PHPUnit
 alias phpunit='./vendor/bin/phpunit --stop-on-error --stop-on-failure --display-deprecations --display-phpunit-deprecations --display-notices --display-warnings --exclude-group=skip --exclude-group=quarantined'
-alias t='phpunit'
+alias tt='phpunit'
 alias tf='./vendor/bin/phpunit --stop-on-error --stop-on-failure --display-deprecations --display-phpunit-deprecations --display-notices --display-warnings --filter'
 
 alias phpunit-skip='./vendor/bin/phpunit --stop-on-error --stop-on-failure --display-deprecations --display-phpunit-deprecations --display-notices --display-warnings --group=skip'
