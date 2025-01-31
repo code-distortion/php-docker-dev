@@ -225,11 +225,23 @@ enter_container_or_run_command () {
       die "The \"${CONTAINER}\" container has not been enabled - enable via the .env file"
     fi
 
-    USER=$(pick_user "${CONTAINER}" "${SUDO_REQUESTED}")
+    local USER=$(pick_user "${CONTAINER}" "${SUDO_REQUESTED}")
+
+    # if in a code-distortion package, set the working directory to the package directory
+    local WORKING_DIR=""
+    if [[ "${CONTAINER}" == "php" ]] && [[ -n "${PACKAGE_NAME}" ]]; then
+      WORKING_DIR="/var/www/html/code-distortion/${PACKAGE_NAME}"
+    fi
 
     # bash into the container
     if [ "$#" -eq 1 ]; then
-      run_docker_compose_command exec --user="${USER}" "${CONTAINER}" bash --login
+
+      if [[ -n "${WORKING_DIR}" ]]; then
+        run_docker_compose_command exec --user="${USER}" --workdir="${WORKING_DIR}" "${CONTAINER}" bash --login
+      else
+        run_docker_compose_command exec --user="${USER}" "${CONTAINER}" bash --login
+      fi
+
     # or run a command in the container
     else
       shift 1
@@ -238,7 +250,7 @@ enter_container_or_run_command () {
       local METHOD='exec'
       if [[ "$1" == "run" ]]; then
         shift 1
-        local METHOD='run'
+        METHOD='run'
       fi
 
       # execute a "php artisan" command
@@ -251,6 +263,7 @@ enter_container_or_run_command () {
         fi
       fi
 
+      # execute the command in the container
       if [[ "${METHOD}" == "run" ]]; then
         run_docker_compose_command run --rm --user="${USER}" "${CONTAINER}" "$@"
       else
@@ -266,17 +279,34 @@ enter_container_or_run_command () {
 
 ### script start
 
+CALLED_FROM_DIR="$(pwd)"
+
 # change directory so the xxx.yml files can be found
 CURRENT_SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 cd "${CURRENT_SCRIPT_DIR}" || exit
 
+# if called from within a dir called code-distortion, resolve the package name
+PACKAGE_NAME=""
+BASE_DIR="$( cd "${CURRENT_SCRIPT_DIR}/.." &> /dev/null && pwd )"
+# see if CALLED_FROM_DIR is a subdirectory of BASE_DIR
+if [[ "${CALLED_FROM_DIR}/" == "${BASE_DIR}/code-distortion/"* ]]; then
+  REMAINDER_DIR="${CALLED_FROM_DIR#"${BASE_DIR}/code-distortion/"}"
+  # if REMAINDER_DIR is not the same as CALLED_FROM_DIR, then we are in a subdirectory
+  if [[ "${REMAINDER_DIR}" != "${CALLED_FROM_DIR}" ]]; then
+    # pick the first directory part from REMAINDER_DIR
+    PACKAGE_NAME="${REMAINDER_DIR%%/*}"
+  fi
+fi
+
+
+
 init_check
 find_containers
 
-# jump into the mysql database - if requested
+# 1. jump into the mysql database - if requested
 enter_mysql_database "$@"
 
-# jump into the mysql_memory database - if requested
+# 2. jump into the mysql_memory database - if requested
 enter_mysql_memory_database "$@"
 
 # check if sudo is desired
@@ -286,8 +316,8 @@ if [[ "$1" == "sudo" ]]; then
   shift 1 # remove "sudo" from the arguments
 fi
 
-# 2. either enter into a particular container, or execute something in it - if requested
+# 3. either enter into a particular container, or execute something in it - if requested
 enter_container_or_run_command "$@"
 
-# 3. or just pass the command through to docker compose
+# 4. or just pass the command through to docker compose
 run_docker_compose_command ${ORIG_ARGS}
