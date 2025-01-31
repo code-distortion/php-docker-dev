@@ -27,6 +27,7 @@ services:
       - 'host.docker.internal:host-gateway'
     volumes:
       - ${PHP_VOLUME_SOURCE:-../}:/var/www/html
+      - ./volumes/php-old/.composer:/var/www/.composer
       - ./build/php_old/profile.d:/etc/profile.d
       - ./volumes/shared:/shared
       - ${SSH_AGENT_PATH}:/ssh_agent
