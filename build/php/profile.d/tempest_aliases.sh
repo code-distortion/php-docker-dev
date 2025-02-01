@@ -1,4 +1,4 @@
 #!/bin/bash
 
 alias tempest="./tempest"
-alias t="tempest"
+alias tmp="tempest"
