@@ -20,63 +20,34 @@ RUN if [ ${SET_WWW_DATA_USER} = true ]; then \
 
 
 # ====== PHP extensions ======
-RUN apt-get update --allow-releaseinfo-change-suite \
+RUN apt-get update \
     && apt-get install -y \
-#        g++ \
+        apache2-utils \
         git \
+        gettext \
+        gzip \
         libfreetype6-dev \
         libicu-dev \
         libjpeg62-turbo-dev \
         libmcrypt-dev \
         libpng-dev \
-        libxslt-dev \
         libzip-dev \
+#        procps \
+        supervisor \
+        vim \
+        wget \
         zip \
         zlib1g-dev \
-#    && docker-php-ext-configure gd --with-jpeg \
+    && docker-php-ext-configure gd --with-jpeg \
     && docker-php-ext-install -j$(nproc) gd \
-#    && docker-php-ext-install bcmath \
+    && docker-php-ext-install bcmath \
 #    && docker-php-ext-install calendar \
-#    && docker-php-ext-install exif \
-#    && docker-php-ext-install gettext \
-#    && docker-php-ext-install intl \
-    && docker-php-ext-install mysqli \
-#    && docker-php-ext-install opcache \
+    && docker-php-ext-install intl \
+#    && docker-php-ext-install mysqli \
     && docker-php-ext-install pdo_mysql \
-#    && docker-php-ext-install sockets \
-#    && docker-php-ext-install soap \
-#    && docker-php-ext-install sysvmsg \
-#    && docker-php-ext-install sysvsem \
-#    && docker-php-ext-install sysvshm \
-#    && docker-php-ext-install wddx \
-#    && docker-php-ext-install xsl \
+    && docker-php-ext-install pcntl \
     && docker-php-ext-install zip \
-#        apache2-utils \
-#        git \
-#        gettext \
-#        gzip \
-#        libfreetype6-dev \
-#        libicu-dev \
-#        libjpeg62-turbo-dev \
-#        libmcrypt-dev \
-#        libpng-dev \
-#        libzip-dev \
-##        procps \
-#        supervisor \
-#        vim \
-#        wget \
-#        zip \
-#        zlib1g-dev \
-##    && docker-php-ext-configure gd --with-jpeg \
-#    && docker-php-ext-install -j$(nproc) gd \
-#    && docker-php-ext-install bcmath \
-##    && docker-php-ext-install calendar \
-#    && docker-php-ext-install intl \
-##    && docker-php-ext-install mysqli \
-#    && docker-php-ext-install pdo_mysql \
-#    && docker-php-ext-install pcntl \
-#    && docker-php-ext-install zip \
-    && apt-get clean && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
     ;
 
 
@@ -203,7 +174,6 @@ RUN mkdir /tmp/phpstan/ && chown www-data: /tmp/phpstan/
 COPY configs/ssh_config /etc/ssh/ssh_config
 
 COPY configs/supervisord.laravel-serve.conf /etc/supervisor/conf.d/supervisord.laravel-serve.template.conf
-COPY configs/supervisord.tempest-serve.conf /etc/supervisor/conf.d/supervisord.tempest-serve.template.conf
 COPY configs/supervisord.php-serve.conf /etc/supervisor/conf.d/supervisord.php-serve.template.conf
 
 COPY configs/ini/1.php.ini /usr/local/etc/php/conf.d/
