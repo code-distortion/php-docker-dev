@@ -81,8 +81,8 @@ RUN if [ ${PHP_INSTALL_PCOV} = true ]; then \
 
 # ====== install nodejs and npm ======
 ARG PHP_INSTALL_NPM
-ARG INSTALL_INTELEPHENSE
-RUN if [ ${PHP_INSTALL_NPM} = true ] || [ ${INSTALL_INTELEPHENSE} = true ]; then \
+ARG PHP_INSTALL_INTELEPHENSE
+RUN if [ ${PHP_INSTALL_NPM} = true ] || [ ${PHP_INSTALL_INTELEPHENSE} = true ]; then \
     apt-get update \
     && apt-get install -y \
         nodejs \
