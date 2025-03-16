@@ -1,6 +1,6 @@
 services:
 
-  selenium:
+  selenium-chrome:
     image: '${SELENIUM_IMAGE:-selenium/standalone-chrome:latest}'
     volumes:
       - '/dev/shm:/dev/shm'

@@ -1,6 +1,6 @@
 services:
 
-  mysql_memory:
+  mysql-memory:
     image: '${MYSQL_MEMORY_IMAGE:-mysql:8.4}'
     environment:
       MYSQL_ROOT_PASSWORD: '${MYSQL_MEMORY_ROOT_PASSWORD:-}'
