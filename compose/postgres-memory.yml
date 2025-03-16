@@ -1,0 +1,25 @@
+services:
+
+  postgres-memory:
+    build:
+      context: './build/postgres'
+      args:
+        - POSTGRES_IMAGE=${POSTGRES_MEMORY_IMAGE:-postgres:17-bookworm}
+        - POSTGRES_INSTALL_PGVECTOR=${POSTGRES_MEMORY_INSTALL_PGVECTOR:-false}
+        - POSTGRES_PGVECTOR_VERSION=${POSTGRES_MEMORY_PGVECTOR_VERSION:-v0.8.0}
+    environment:
+      - POSTGRES_USER=${POSTGRES_MEMORY_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_MEMORY_PASSWORD:-password}
+      - POSTGRES_DB=${POSTGRES_MEMORY_DB:-db}
+    restart: unless-stopped
+    ports:
+      - '127.0.0.1:${POSTGRES_MEMORY_EXPOSE_PORT:-}:5432'
+    expose:
+      - 5432
+    volumes:
+      - ./volumes/shared:/shared
+      - ./build/postgres/profile.d:/etc/profile.d
+    tmpfs:
+      - /var/lib/postgresql/data
+      - /var/lib/postgresql/wal
+      - /tmp

@@ -1,17 +1,23 @@
 services:
 
   postgres:
-    image: '${POSTGRES_IMAGE:-postgres:17-alpine}'
+    build:
+      context: './build/postgres'
+      args:
+        - POSTGRES_IMAGE=${POSTGRES_IMAGE:-postgres:17-bookworm}
+        - POSTGRES_INSTALL_PGVECTOR=${POSTGRES_INSTALL_PGVECTOR:-false}
+        - POSTGRES_PGVECTOR_VERSION=${POSTGRES_PGVECTOR_VERSION:-v0.8.0}
     environment:
-      POSTGRES_USER: '${POSTGRES_USER:-root}'
-      POSTGRES_PASSWORD: '${POSTGRES_PASSWORD:-password}'
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-password}
+      - POSTGRES_DB=${POSTGRES_DB:-db}
+    restart: unless-stopped
     ports:
       - '127.0.0.1:${POSTGRES_EXPOSE_PORT:-}:5432'
     expose:
       - 5432
-#    tmpfs:
-#      - /var/lib/postgresql/data
     volumes:
-      - ./volumes/postgres:/var/lib/postgresql/data
+      - ./volumes/postgres/data:/var/lib/postgresql/data
+      - ./volumes/postgres/logs:/var/log/postgresql
       - ./volumes/shared:/shared
       - ./build/postgres/profile.d:/etc/profile.d
