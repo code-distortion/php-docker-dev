@@ -1,0 +1,25 @@
+services:
+
+  mariadb-memory:
+    image: '${MARIADB_MEMORY_IMAGE:-mariadb:11.7.2}'
+    environment:
+      MYSQL_ROOT_PASSWORD: '${MARIADB_MEMORY_ROOT_PASSWORD:-}'
+      MYSQL_DATABASE: '${MARIADB_MEMORY_DATABASE:-db}'
+      MYSQL_USER: '${MARIADB_MEMORY_USER:-db}'
+      MYSQL_PASSWORD: '${MARIADB_MEMORY_PASSWORD:-}'
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+    ports:
+      - '127.0.0.1:${MARIADB_MEMORY_EXPOSE_PORT:-}:3306'
+    expose:
+      - 3306
+    tmpfs:
+      - /var/lib/mysql
+    volumes:
+      # - ./volumes/mariadb:/var/lib/mysql
+      - ./volumes/shared:/shared
+      - ./build/mariadb/configuration/my.cnf:/etc/mysql/my.cnf
+      - ./build/mariadb/profile.d:/etc/profile.d
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-p${MARIADB_MEMORY_PASSWORD:-}"]
+      retries: 3
+      timeout: 5s

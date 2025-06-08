@@ -17,8 +17,8 @@ services:
     volumes:
 #      - ./volumes/mysql:/var/lib/mysql
       - ./volumes/shared:/shared
-      - ./build/mysql_memory/configuration/my.cnf:/etc/mysql/my.cnf
-      - ./build/mysql_memory/profile.d:/etc/profile.d
+      - ./build/mysql/configuration/my.cnf:/etc/mysql/my.cnf
+      - ./build/mysql/profile.d:/etc/profile.d
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-p${MYSQL_MEMORY_PASSWORD:-}"]
       retries: 3

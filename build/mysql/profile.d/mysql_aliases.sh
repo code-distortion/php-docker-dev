@@ -1,3 +1,3 @@
 #!/bin/bash
 
-alias db="mysql -h mysql -u root --password=\$MYSQL_ROOT_PASSWORD -A \$MYSQL_DATABASE"
+alias db="mysql -h localhost -u root --password=\$MYSQL_ROOT_PASSWORD -A \$MYSQL_DATABASE"
