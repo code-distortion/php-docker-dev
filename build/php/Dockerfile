@@ -143,7 +143,8 @@ RUN git config --global user.email "$GIT_EMAIL" \
 # ====== chromium ======
 ARG PHP_INSTALL_CHROMIUM
 RUN if [ "$PHP_INSTALL_CHROMIUM" = true ]; then \
-    apt-get install -y \
+    apt-get update \
+    && apt-get install -y \
         chromium \
         # for chromedriver...
         libnss3 \
