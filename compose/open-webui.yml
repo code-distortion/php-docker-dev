@@ -1,0 +1,13 @@
+services:
+
+  open-webui:
+    image: '${OPEN_WEBUI_IMAGE:-ghcr.io/open-webui/open-webui:main}'
+    environment:
+      - OLLAMA_BASE_URL=http://ollama:11434 # connect to the ollama container
+    ports:
+      - "${OPEN_WEBUI_EXPOSE_TO_IP:-127.0.0.1}:${OPEN_WEBUI_PORT:-3000}:8080"
+    volumes:
+      - ./volumes/open-webui:/app/backend/data
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
