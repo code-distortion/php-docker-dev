@@ -1,7 +1,7 @@
 services:
 
   mariadb:
-    image: '${MARIADB_IMAGE:-mariadb:11.7.2}'
+    image: '${MARIADB_IMAGE:-mariadb:11.8.2}'
     environment:
       MYSQL_ROOT_PASSWORD: '${MARIADB_ROOT_PASSWORD:-}'
       MYSQL_DATABASE: '${MARIADB_DATABASE:-db}'

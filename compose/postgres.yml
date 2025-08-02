@@ -4,7 +4,7 @@ services:
     build:
       context: './build/postgres'
       args:
-        - POSTGRES_IMAGE=${POSTGRES_IMAGE:-postgres:17-bookworm}
+        - POSTGRES_IMAGE=${POSTGRES_IMAGE:-postgres:17.5-bookworm}
         - POSTGRES_INSTALL_PGVECTOR=${POSTGRES_INSTALL_PGVECTOR:-false}
         - POSTGRES_PGVECTOR_VERSION=${POSTGRES_PGVECTOR_VERSION:-v0.8.0}
     environment:

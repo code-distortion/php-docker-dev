@@ -81,8 +81,7 @@ RUN if [ "$PHP_INSTALL_REDIS" = true ]; then \
 
 # ====== install nodejs and npm ======
 ARG PHP_INSTALL_NPM
-ARG PHP_INSTALL_INTELEPHENSE
-RUN if [ ${PHP_INSTALL_NPM} = true ] || [ ${PHP_INSTALL_INTELEPHENSE} = true ]; then \
+RUN if [ ${PHP_INSTALL_NPM} = true ]; then \
     apt-get update \
     && apt-get install -y \
         nodejs \
@@ -150,14 +149,6 @@ RUN if [ "$PHP_INSTALL_CHROMIUM" = true ]; then \
         libnss3 \
         libdbus-1-3 \
     && apt-get -y autoremove && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
-;fi
-
-
-
-# ====== install intelliphense (for VS Code) ======
-ARG INSTALL_INTELEPHENSE
-RUN if [ ${INSTALL_INTELEPHENSE} = true ]; then \
-    npm install -g intelephense \
 ;fi
 
 

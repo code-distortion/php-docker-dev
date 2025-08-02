@@ -1,7 +1,7 @@
 services:
 
   mariadb-memory:
-    image: '${MARIADB_MEMORY_IMAGE:-mariadb:11.7.2}'
+    image: '${MARIADB_MEMORY_IMAGE:-mariadb:11.8.2}'
     environment:
       MYSQL_ROOT_PASSWORD: '${MARIADB_MEMORY_ROOT_PASSWORD:-}'
       MYSQL_DATABASE: '${MARIADB_MEMORY_DATABASE:-db}'
