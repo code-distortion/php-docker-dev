@@ -1,0 +1,49 @@
+services:
+
+  php-claude:
+    build:
+      context: './build/php_claude'
+      args:
+        - PHP_IMAGE=${PHP_IMAGE:-php:8.4-fpm-bookworm}
+        - SET_WWW_DATA_USER=${SET_WWW_DATA_USER:-true}
+        - WWW_DATA_UID=${WWW_DATA_UID:-1000}
+        - WWW_DATA_GID=${WWW_DATA_GID:-1000}
+        - GIT_USER=${GIT_USER:-Your Name}
+        - GIT_EMAIL=${GIT_EMAIL:-your@email.com}
+        - PHP_INSTALL_CHROMIUM=${PHP_INSTALL_CHROMIUM:-false}
+        - PHP_INSTALL_COMPOSER=${PHP_INSTALL_COMPOSER:-true}
+        - PHP_INSTALL_NPM=${PHP_INSTALL_NPM:-false}
+        - PHP_INSTALL_MYSQL_CLIENT=${PHP_INSTALL_MYSQL_CLIENT:-true}
+        - PHP_INSTALL_PCOV=${PHP_INSTALL_PCOV:-true}
+        - PHP_INSTALL_POSTGRES_CLIENT=${PHP_INSTALL_POSTGRES_CLIENT:-false}
+        - PHP_INSTALL_REDIS=${PHP_INSTALL_REDIS:-true}
+        - PHP_INSTALL_XDEBUG=${PHP_INSTALL_XDEBUG:-false}
+        - PHP_POSTGRES_CLIENT_VERSION=${PHP_POSTGRES_CLIENT_VERSION:-postgresql-client-17}
+        - PHP_SERVE_WEB_ROOT=${PHP_SERVE_WEB_ROOT:-/var/www/html}
+        - PHP_CLAUDE_INSTALL_CCSTATUSLINE=${PHP_CLAUDE_INSTALL_CCSTATUSLINE:-true}
+        - PHP_CLAUDE_INSTALL_CCUSAGE=${PHP_CLAUDE_INSTALL_CCUSAGE:-true}
+    environment:
+      - PHP_SERVE_WEB_ROOT=${PHP_SERVE_WEB_ROOT:-/var/www/html}
+      - PHP_SERVE_USING_PHP=${PHP_SERVE_USING_PHP:-false}
+      - PHP_SERVE_USING_LARAVEL=${PHP_SERVE_USING_LARAVEL:-false}
+      - PHP_SERVE_USING_TEMPEST=${PHP_SERVE_USING_TEMPEST:-false}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-}
+      - SSH_AUTH_SOCK=/ssh_agent
+      - XDEBUG_CONFIG=${PHP_XDEBUG_CONFIG:-client_host=host.docker.internal xdebug.mode=develop,coverage,debug}
+      - DEV_NAME=${PHP_CLAUDE_DEV_NAME:-}
+      - DEV_TIMEZONE=${PHP_CLAUDE_DEV_TIMEZONE:-}
+    ports:
+      - "${NGINX_EXPOSE_TO_IP:-127.0.0.1}:${NGINX_HTTP_PORT:-}:80"
+      - "${NGINX_EXPOSE_TO_IP:-127.0.0.1}:${PHP_REVERB_PORT:-}:8080"
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    volumes:
+      - ${PHP_VOLUME_SOURCE:-../}:/var/www/html
+      - ./volumes/php/.composer:/home/www-data/.composer
+      - ./volumes/php/.claude:/home/www-data/.claude
+      - ./volumes/php/.claude.json:/home/www-data/.claude.json
+      - ./build/php/profile.d:/etc/profile.d
+      - ./volumes/shared:/shared
+      # - ${SSH_AGENT_PATH}:/ssh_agent
+#      - ./logs/php:/var/www/html/storage/logs
+    working_dir: "${PHP_WORKING_DIR:-/var/www/html/}"

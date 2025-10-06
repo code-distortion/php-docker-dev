@@ -1,0 +1,139 @@
+{
+  "version": 3,
+  "lines": [
+    [
+      {
+        "id": "1",
+        "type": "model",
+        "color": "magenta"
+      },
+      {
+        "id": "2",
+        "type": "separator"
+      },
+      {
+        "id": "4850b51d-6e71-44e1-b1e3-7dd74b47efab",
+        "type": "current-working-dir",
+        "color": "brightBlack"
+      },
+      {
+        "id": "6",
+        "type": "separator"
+      },
+      {
+        "id": "5",
+        "type": "git-branch",
+        "color": "magenta"
+      },
+      {
+        "id": "be7f6c5d-e329-4e95-83c1-0e04be25e84b",
+        "type": "custom-text",
+        "color": "white",
+        "customText": " "
+      },
+      {
+        "id": "7",
+        "type": "git-changes",
+        "color": "brightBlack"
+      },
+      {
+        "id": "76ad8846-9ac9-48bd-8d68-e93d44e9afbc",
+        "type": "separator"
+      },
+      {
+        "id": "ead79cc3-be2a-4f94-8881-124226db4663",
+        "type": "tokens-cached",
+        "color": "magenta"
+      },
+      {
+        "id": "ad551da4-b3c3-43a6-8f7b-ffb04e279f0e",
+        "type": "custom-text",
+        "color": "white",
+        "customText": " + "
+      },
+      {
+        "id": "68da52ac-dd75-44e2-90d1-c8e79d10ac44",
+        "type": "tokens-input",
+        "color": "magenta"
+      },
+      {
+        "id": "d3ece3ee-8254-451c-bbb0-4812f321354b",
+        "type": "custom-text",
+        "color": "white",
+        "customText": " + "
+      },
+      {
+        "id": "21a707e6-8335-4f8a-8cb0-996df2081b1b",
+        "type": "tokens-output",
+        "color": "magenta"
+      },
+      {
+        "id": "efc8790d-cda3-468b-a4cc-380983f5d4e5",
+        "type": "custom-text",
+        "color": "white",
+        "customText": " = "
+      },
+      {
+        "id": "bb83e715-dcb4-406d-a69e-8c9cd9df068f",
+        "type": "tokens-total",
+        "color": "magenta"
+      },
+      {
+        "id": "3b46d3a4-4933-4adf-bd1a-1ed7c259e957",
+        "type": "custom-text",
+        "color": "brightBlack",
+        "customText": " [Current: "
+      },
+      {
+        "id": "1efe8b0e-483d-4f4e-904e-cc2efccff169",
+        "type": "context-length",
+        "color": "magenta"
+      },
+      {
+        "id": "15df0107-e49e-46eb-a68f-89fcee971dfe",
+        "type": "custom-text",
+        "color": "brightBlack",
+        "customText": ", "
+      },
+      {
+        "id": "4d1c60d8-d923-4ed3-9f2a-db7491ff8ae4",
+        "type": "context-percentage",
+        "color": "magenta"
+      },
+      {
+        "id": "8c66f982-0b88-49ff-b6f5-3b1f98b4a677",
+        "type": "custom-text",
+        "color": "brightBlack",
+        "customText": "]"
+      },
+      {
+        "id": "48ded9e2-430d-4b85-89f3-1e01d0fdc5d9",
+        "type": "separator"
+      },
+      {
+        "id": "5af78863-c0ba-482d-a590-026e5c6fd070",
+        "type": "session-cost",
+        "color": "brightBlack"
+      }
+    ],
+    [],
+    []
+  ],
+  "flexMode": "full-minus-40",
+  "compactThreshold": 60,
+  "colorLevel": 2,
+  "inheritSeparatorColors": false,
+  "globalBold": false,
+  "powerline": {
+    "enabled": false,
+    "separators": [
+      ""
+    ],
+    "separatorInvertBackground": [
+      false
+    ],
+    "startCaps": [],
+    "endCaps": [],
+    "autoAlign": false
+  }
+}
