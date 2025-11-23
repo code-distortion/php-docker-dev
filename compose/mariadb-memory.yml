@@ -1,7 +1,7 @@
 services:
 
   mariadb-memory:
-    image: '${MARIADB_MEMORY_IMAGE:-mariadb:11.8.2}'
+    image: '${MARIADB_MEMORY_IMAGE:-mariadb:12.2}'
     environment:
       MYSQL_ROOT_PASSWORD: '${MARIADB_MEMORY_ROOT_PASSWORD:-}'
       MYSQL_DATABASE: '${MARIADB_MEMORY_DATABASE:-db}'
@@ -11,7 +11,7 @@ services:
     ports:
       - '127.0.0.1:${MARIADB_MEMORY_EXPOSE_PORT:-}:3306'
     expose:
-      - 3306
+      - 3307
     tmpfs:
       - /var/lib/mysql
     volumes:

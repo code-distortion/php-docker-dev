@@ -1,7 +1,7 @@
 services:
 
   mysql:
-    image: '${MYSQL_IMAGE:-mysql:8.4}'
+    image: '${MYSQL_IMAGE:-mysql:9.5}'
     environment:
       MYSQL_ROOT_PASSWORD: '${MYSQL_ROOT_PASSWORD:-}'
       MYSQL_DATABASE: '${MYSQL_DATABASE:-db}'

@@ -4,7 +4,7 @@ services:
     build:
       context: './build/node'
       args:
-        - NODE_IMAGE=${NODE_IMAGE:-node:24-bookworm}
+        - NODE_IMAGE=${NODE_IMAGE:-node:25-bookworm}
     ports:
       - "${NGINX_EXPOSE_TO_IP:-127.0.0.1}:${NODE_NPM_RUN_DEV_PORT:-}:5173"
     volumes:
