@@ -166,6 +166,8 @@ RUN chown www-data: /var/log/php.log
 # ====== chown these directories so programs can create necessary cache directories etc as needed ======
 RUN chown www-data: /var/www
 RUN mkdir /tmp/phpstan/ && chown www-data: /tmp/phpstan/
+# chown the volume on the host instead: sudo chown -R 1000:1000 ./docker/volumes/php/.composer
+#RUN mkdir /var/www/.composer && chown www-data: /var/www/.composer
 
 
 
